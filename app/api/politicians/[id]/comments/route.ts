@@ -63,7 +63,7 @@ export async function GET(
       .select('*')
       .eq('politician_id', id)
       .eq('flagged', false)
-      .isNull('parent_id')
+      .is('parent_id', null)
       .order('created_at', { ascending: false })
 
     if (error) throw error

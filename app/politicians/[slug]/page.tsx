@@ -31,7 +31,7 @@ export default async function PoliticianPage(props: { params: Promise<{ slug: st
     notFound()
   }
 
-  const posts = await getPosts(politician.geography_id, politician.id, 10)
+  const posts = await getPosts(politician.geography_id ?? undefined, politician.id, 10)
   const comments = await getComments(politician.id, 15)
   const votes = await getVotes(politician.id, 10)
 
