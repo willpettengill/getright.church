@@ -8,19 +8,32 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Semantic design tokens based on aesthetic system
+        // Core semantic tokens
         background: 'var(--bg-primary)',
         foreground: 'var(--text-primary)',
-        accent: 'var(--accent-primary)',
+        // Background layers
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'bg-tertiary': 'var(--bg-tertiary)',
+        // Text layers
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
+        // Accent
+        'accent-primary': 'var(--accent-primary)',
         'accent-dark': 'var(--accent-dark)',
+        'accent-light': 'var(--accent-light)',
+        // Neutral
         'neutral-muted': 'var(--neutral-muted)',
         'neutral-light': 'var(--neutral-light)',
+        // Status
         'status-positive': 'var(--status-positive)',
         'status-negative': 'var(--status-negative)',
+        'status-warning': 'var(--status-warning)',
       },
       fontFamily: {
         mono: ['Menlo', 'Monaco', 'Courier New', 'monospace'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         xs: '0.75rem',

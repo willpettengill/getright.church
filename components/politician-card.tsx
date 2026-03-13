@@ -24,7 +24,7 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
     <Link href={`/politicians/${politician.slug}`}>
       <div className="card hover:border-accent-primary transition-colors cursor-pointer h-full flex flex-col">
         {politician.portrait_url && (
-          <div className="mb-4 -m-6 mb-4 bg-gradient-to-b from-neutral-muted to-bg-tertiary p-4">
+          <div className="-mx-6 -mt-6 mb-4 bg-bg-tertiary p-4">
             <img
               src={politician.portrait_url}
               alt={politician.name}

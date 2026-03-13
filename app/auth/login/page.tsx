@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -91,12 +91,20 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm font-mono text-text-secondary">
-          Don't have an account?{' '}
+          {'Don\'t have an account?'}{' '}
           <Link href="/auth/sign-up" className="text-accent-primary hover:text-accent-light">
             Sign up
           </Link>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <LoginForm />
+    </Suspense>
   )
 }
