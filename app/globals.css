@@ -40,7 +40,9 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans leading-normal;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    @apply font-sans leading-relaxed;
   }
 
   h1 {
