@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Politician, Post, Vote, Comment, Geography } from '@/lib/types'
+import type { Politician, Post, Vote, Comment, Geography, IssueWithVotes, IssuePositionWithPolitician, PoliticianIssue } from '@/lib/types'
 
 export async function getPoliticians(
   geographyId?: string,
@@ -138,4 +138,108 @@ export async function getGeography(slug: string): Promise<Geography> {
     throw new Error(`Geography not found: ${slug}`)
   }
   return data as Geography
+}
+
+export async function getIssues(): Promise<IssueWithVotes[]> {
+  const supabase = await createClient()
+  const { data: issues, error } = await supabase
+    .from('issues')
+    .select('*')
+    .order('category', { ascending: true })
+
+  if (error || !issues) {
+    console.error('[v0] getIssues error:', error?.message)
+    return []
+  }
+
+  const { data: votes } = await supabase
+    .from('issue_votes')
+    .select('issue_id, vote')
+
+  const votemap = (votes ?? []).reduce<Record<string, Record<string, number>>>((acc, v) => {
+    if (!acc[v.issue_id]) acc[v.issue_id] = { support: 0, oppose: 0, neutral: 0 }
+    acc[v.issue_id][v.vote] = (acc[v.issue_id][v.vote] ?? 0) + 1
+    return acc
+  }, {})
+
+  return issues.map((issue) => {
+    const vm = votemap[issue.id] ?? { support: 0, oppose: 0, neutral: 0 }
+    return {
+      ...issue,
+      support_count: vm.support,
+      oppose_count: vm.oppose,
+      neutral_count: vm.neutral,
+      total_count: vm.support + vm.oppose + vm.neutral,
+    }
+  })
+}
+
+export async function getIssue(slug: string): Promise<IssueWithVotes> {
+  const supabase = await createClient()
+  const { data: issue, error } = await supabase
+    .from('issues')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (error || !issue) throw new Error(`Issue not found: ${slug}`)
+
+  const { data: votes } = await supabase
+    .from('issue_votes')
+    .select('vote')
+    .eq('issue_id', issue.id)
+
+  const counts = (votes ?? []).reduce<Record<string, number>>(
+    (acc, v) => { acc[v.vote] = (acc[v.vote] ?? 0) + 1; return acc },
+    { support: 0, oppose: 0, neutral: 0 }
+  )
+
+  return {
+    ...issue,
+    support_count: counts.support,
+    oppose_count: counts.oppose,
+    neutral_count: counts.neutral,
+    total_count: counts.support + counts.oppose + counts.neutral,
+  }
+}
+
+export async function getIssuePositions(issueId: string): Promise<IssuePositionWithPolitician[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('politician_issue_positions')
+    .select(`
+      *,
+      politician:politicians(id, slug, name, title, party, portrait_url, endorsement_status)
+    `)
+    .eq('issue_id', issueId)
+    .order('position', { ascending: true })
+
+  if (error) {
+    console.error('[v0] getIssuePositions error:', error.message)
+    return []
+  }
+  return (data ?? []) as IssuePositionWithPolitician[]
+}
+
+export async function getPoliticianIssuePositions(politicianId: string): Promise<PoliticianIssue[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('politician_issue_positions')
+    .select(`
+      position,
+      notes,
+      issue:issues(*)
+    `)
+    .eq('politician_id', politicianId)
+
+  if (error) {
+    console.error('[v0] getPoliticianIssuePositions error:', error.message)
+    return []
+  }
+
+  return (data ?? []).map((row: any) => ({
+    ...row.issue,
+    position: row.position,
+    notes: row.notes,
+  })) as PoliticianIssue[]
 }

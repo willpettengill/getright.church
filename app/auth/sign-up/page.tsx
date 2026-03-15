@@ -17,22 +17,17 @@ export default function SignUpPage() {
     e.preventDefault()
     setError(null)
     setLoading(true)
-
     try {
       const supabase = createClient()
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            username,
-          },
+          data: { username },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
-
       if (error) throw error
-
       router.push('/auth/sign-up-success')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign up')
@@ -42,78 +37,236 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold font-mono text-accent-primary mb-2">
-            get-right.church
-          </h1>
-          <p className="text-text-secondary">Join the movement</p>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'var(--bg-primary)',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+      }}
+    >
+      {/* Left panel — branding */}
+      <div
+        className="hidden md:flex"
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'var(--bg-secondary)',
+          borderRight: '1px solid var(--border)',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '3rem',
+        }}
+      >
+        <div className="scanlines" style={{ position: 'absolute', inset: 0, opacity: 0.5 }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '-10%',
+            right: '-20%',
+            width: '80%',
+            height: '80%',
+            background: 'radial-gradient(circle, rgba(64,145,108,0.08) 0%, transparent 65%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <Link
+            href="/"
+            style={{
+              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+              fontSize: '1.25rem',
+              letterSpacing: '0.06em',
+              color: 'var(--accent-light)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--accent-primary)',
+                display: 'inline-block',
+              }}
+            />
+            GET-RIGHT.CHURCH
+          </Link>
         </div>
 
-        <form onSubmit={handleSignUp} className="space-y-4">
-          {error && (
-            <div className="bg-status-negative/10 border border-status-negative text-status-negative p-3 rounded text-sm font-mono">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="username" className="block text-sm font-mono text-text-secondary mb-2">
-              Username
-            </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 bg-bg-secondary border border-neutral-muted rounded text-text-primary font-mono text-sm focus:outline-none focus:border-accent-primary"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-mono text-text-secondary mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-bg-secondary border border-neutral-muted rounded text-text-primary font-mono text-sm focus:outline-none focus:border-accent-primary"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-mono text-text-secondary mb-2">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-bg-secondary border border-neutral-muted rounded text-text-primary font-mono text-sm focus:outline-none focus:border-accent-primary"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-4 py-3 bg-accent-primary text-white font-mono font-bold rounded hover:bg-accent-dark disabled:opacity-50 transition-colors"
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+              fontSize: 'clamp(2.5rem, 4vw, 4rem)',
+              letterSpacing: '0.04em',
+              lineHeight: 0.95,
+              color: 'var(--text-primary)',
+              marginBottom: '1rem',
+            }}
           >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
+            SPEAK UP.
+            <br />
+            SHOW UP.
+            <br />
+            <span style={{ color: 'var(--accent-light)' }}>GET RIGHT.</span>
+          </h2>
+          <p
+            style={{
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-tertiary)',
+              letterSpacing: '0.06em',
+              lineHeight: 1.7,
+              maxWidth: '300px',
+            }}
+          >
+            Join a community of people who hold politicians accountable.
+          </p>
+        </div>
+      </div>
 
-        <div className="mt-6 text-center text-sm font-mono text-text-secondary">
-          Already have an account?{' '}
-          <Link href="/auth/login" className="text-accent-primary hover:text-accent-light">
-            Sign in
-          </Link>
+      {/* Right panel — form */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem 1.25rem',
+          gridColumn: 'span 2',
+        }}
+        className="md:col-span-1"
+      >
+        <div style={{ width: '100%', maxWidth: '380px' }}>
+          {/* Mobile logo */}
+          <div className="md:hidden" style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
+            <Link
+              href="/"
+              style={{
+                fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                fontSize: '1.375rem',
+                letterSpacing: '0.06em',
+                color: 'var(--accent-light)',
+              }}
+            >
+              GET-RIGHT.CHURCH
+            </Link>
+          </div>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <p className="section-label" style={{ marginBottom: '0.625rem' }}>Join</p>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                fontSize: '2.5rem',
+                letterSpacing: '0.04em',
+                color: 'var(--text-primary)',
+                lineHeight: 1,
+              }}
+            >
+              Create Account
+            </h1>
+          </div>
+
+          <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {error && (
+              <div
+                style={{
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(248, 113, 113, 0.06)',
+                  border: '1px solid rgba(248, 113, 113, 0.3)',
+                  borderRadius: '2px',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  color: 'var(--status-negative)',
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="username" className="label">Username</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="input"
+                placeholder="your_handle"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="label">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="label">Password</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input"
+                placeholder="min. 8 characters"
+                required
+                minLength={8}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.75rem',
+                opacity: loading ? 0.6 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {loading ? 'Creating...' : 'Create Account →'}
+            </button>
+          </form>
+
+          <p
+            style={{
+              marginTop: '1.5rem',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-tertiary)',
+              letterSpacing: '0.04em',
+              textAlign: 'center',
+            }}
+          >
+            Have an account?{' '}
+            <Link
+              href="/auth/login"
+              style={{ color: 'var(--accent-primary)', fontWeight: 700 }}
+              onMouseEnter={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-light)'
+              }}
+              onMouseLeave={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'
+              }}
+            >
+              Sign in →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

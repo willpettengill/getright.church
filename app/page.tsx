@@ -7,75 +7,267 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          {/* Hero Section */}
-          <div className="mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold font-mono mb-4 text-accent-primary">
-              Get Right
+      <main style={{ minHeight: '100vh' }}>
+
+        {/* ── Hero ──────────────────────────────────────────── */}
+        <section
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            borderBottom: '1px solid var(--border)',
+            background: 'linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-primary) 60%)',
+          }}
+        >
+          {/* Scanline overlay */}
+          <div
+            className="scanlines"
+            style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.6 }}
+          />
+          {/* Radial glow behind headline */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '-20%',
+              left: '-10%',
+              width: '70vw',
+              height: '70vw',
+              maxWidth: '700px',
+              maxHeight: '700px',
+              background: 'radial-gradient(circle, rgba(64,145,108,0.07) 0%, transparent 65%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              maxWidth: '1280px',
+              margin: '0 auto',
+              padding: '5rem 1.25rem 4rem',
+            }}
+          >
+            {/* Eyebrow label */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.625rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <span
+                className="animate-pulse-dot"
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-primary)',
+                  boxShadow: '0 0 8px var(--accent-primary)',
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 700,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: 'var(--accent-primary)',
+                }}
+              >
+                Political Intelligence Platform
+              </span>
+            </div>
+
+            {/* Main headline */}
+            <h1
+              style={{
+                fontFamily: 'var(--font-display), "Bebas Neue", Impact, sans-serif',
+                fontSize: 'clamp(4rem, 12vw, 9rem)',
+                letterSpacing: '0.04em',
+                lineHeight: 0.92,
+                color: 'var(--text-primary)',
+                marginBottom: '0.5rem',
+                maxWidth: '900px',
+              }}
+            >
+              GET
+              <br />
+              <span style={{ color: 'var(--accent-light)' }}>RIGHT</span>
             </h1>
-            <p className="text-xl text-text-secondary font-mono mb-8 max-w-2xl">
-              Real-time political sentiment, voter engagement, and endorsement tracking for the movement.
+
+            <p
+              style={{
+                fontSize: 'var(--text-base)',
+                color: 'var(--text-secondary)',
+                maxWidth: '520px',
+                lineHeight: 1.7,
+                marginBottom: '2.5rem',
+                letterSpacing: '0.02em',
+              }}
+            >
+              Real-time political sentiment, voter accountability, and endorsement
+              tracking for the movement. Know who's with us and who isn't.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-12">
-              <Link
-                href="/politicians"
-                className="button-primary font-mono"
-              >
-                Browse Politicians
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <Link href="/politicians" className="btn-primary">
+                Browse Politicians →
               </Link>
-              <Link
-                href="/geographies"
-                className="button-secondary font-mono"
-              >
+              <Link href="/geographies" className="btn-outline">
                 Explore by Region
               </Link>
             </div>
           </div>
+        </section>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 p-6 bg-bg-secondary border border-neutral-muted rounded">
-            <div>
-              <p className="text-sm font-mono text-text-secondary mb-2">Total Politicians Tracked</p>
-              <p className="text-3xl font-bold text-accent-primary">1,247</p>
-            </div>
-            <div>
-              <p className="text-sm font-mono text-text-secondary mb-2">Active Posts Analyzed</p>
-              <p className="text-3xl font-bold text-accent-primary">45,892</p>
-            </div>
-            <div>
-              <p className="text-sm font-mono text-text-secondary mb-2">Community Members</p>
-              <p className="text-3xl font-bold text-accent-primary">3,421</p>
-            </div>
-            <div>
-              <p className="text-sm font-mono text-text-secondary mb-2">Endorsements Made</p>
-              <p className="text-3xl font-bold text-accent-primary">892</p>
-            </div>
+        {/* ── Stat grid ─────────────────────────────────────── */}
+        <section
+          style={{
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--bg-secondary)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1280px',
+              margin: '0 auto',
+              padding: '0 1.25rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+            }}
+          >
+            {[
+              { value: '1,247', label: 'Politicians Tracked', sub: 'and counting' },
+              { value: '45.8K', label: 'Posts Analyzed', sub: 'sentiment signals' },
+              { value: '3,421', label: 'Community Members', sub: 'active participants' },
+              { value: '892',   label: 'Endorsements', sub: 'made by get-right' },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                style={{
+                  padding: '2rem 1.5rem',
+                  borderLeft: i > 0 ? '1px solid var(--border)' : 'none',
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                    fontSize: 'clamp(2rem, 4vw, 3rem)',
+                    letterSpacing: '0.03em',
+                    color: 'var(--accent-light)',
+                    lineHeight: 1,
+                    marginBottom: '0.375rem',
+                  }}
+                >
+                  {stat.value}
+                </p>
+                <p
+                  style={{
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  {stat.label}
+                </p>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
+                  {stat.sub}
+                </p>
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* Pulse Feed Section */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold font-mono mb-8 text-text-primary">
-              The Pulse: Real-Time Sentiment
-            </h2>
-            <PulseFeed />
-          </div>
-
-          {/* CTA Section */}
-          <div className="bg-gradient-to-r from-accent-dark to-accent-primary/20 border border-accent-primary rounded p-12 text-center">
-            <h3 className="text-2xl font-bold font-mono mb-4">Join the Movement</h3>
-            <p className="text-text-secondary mb-6 max-w-xl mx-auto">
-              Engage with politicians, track sentiment, and build a community focused on real change.
-            </p>
-            <Link
-              href="/auth/sign-up"
-              className="inline-block px-6 py-3 bg-accent-primary text-white font-mono font-bold rounded hover:bg-accent-dark transition-colors"
+        {/* ── The Pulse ──────────────────────────────────────── */}
+        <section
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+            padding: '4rem 1.25rem',
+          }}
+        >
+          {/* Section heading */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <p className="section-label" style={{ marginBottom: '0.625rem' }}>Live Feed</p>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                fontSize: 'clamp(2rem, 5vw, 3.25rem)',
+                letterSpacing: '0.04em',
+                color: 'var(--text-primary)',
+                lineHeight: 1,
+              }}
             >
-              Get Started
-            </Link>
+              The Pulse
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', marginTop: '0.5rem', letterSpacing: '0.02em' }}>
+              Real-time community sentiment from across the platform.
+            </p>
           </div>
-        </div>
+
+          <PulseFeed />
+        </section>
+
+        {/* ── CTA ────────────────────────────────────────────── */}
+        <section
+          style={{
+            borderTop: '1px solid var(--border)',
+            background: 'var(--bg-secondary)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1280px',
+              margin: '0 auto',
+              padding: '4rem 1.25rem',
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              gap: '2rem',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <p className="section-label" style={{ marginBottom: '0.75rem' }}>Community</p>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                  fontSize: 'clamp(2.25rem, 5vw, 3.5rem)',
+                  letterSpacing: '0.04em',
+                  color: 'var(--text-primary)',
+                  lineHeight: 1,
+                  marginBottom: '0.875rem',
+                }}
+              >
+                Join the Movement
+              </h2>
+              <p
+                style={{
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--text-secondary)',
+                  maxWidth: '460px',
+                  lineHeight: 1.7,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Engage with politicians, track sentiment, and build community around real political accountability.
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flexShrink: 0 }}>
+              <Link href="/auth/sign-up" className="btn-primary">
+                Create Account →
+              </Link>
+              <Link href="/politicians" className="btn-ghost">
+                Browse First
+              </Link>
+            </div>
+          </div>
+        </section>
+
       </main>
       <Footer />
     </>

@@ -15,25 +15,33 @@ module.exports = {
         'bg-primary': 'var(--bg-primary)',
         'bg-secondary': 'var(--bg-secondary)',
         'bg-tertiary': 'var(--bg-tertiary)',
+        'bg-elevated': 'var(--bg-elevated)',
         // Text layers
         'text-primary': 'var(--text-primary)',
         'text-secondary': 'var(--text-secondary)',
         'text-tertiary': 'var(--text-tertiary)',
+        'text-faint': 'var(--text-faint)',
         // Accent
         'accent-primary': 'var(--accent-primary)',
         'accent-dark': 'var(--accent-dark)',
+        'accent-deeper': 'var(--accent-deeper)',
         'accent-light': 'var(--accent-light)',
+        'accent-bright': 'var(--accent-bright)',
+        'accent-glow': 'var(--accent-glow)',
         // Neutral
         'neutral-muted': 'var(--neutral-muted)',
+        'neutral-mid': 'var(--neutral-mid)',
         'neutral-light': 'var(--neutral-light)',
+        'border-color': 'var(--border)',
         // Status
         'status-positive': 'var(--status-positive)',
         'status-negative': 'var(--status-negative)',
         'status-warning': 'var(--status-warning)',
       },
       fontFamily: {
-        mono: ['Menlo', 'Monaco', 'Courier New', 'monospace'],
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'Menlo', 'monospace'],
+        sans: ['var(--font-mono)', 'JetBrains Mono', 'Menlo', 'monospace'],
+        display: ['var(--font-display)', 'Bebas Neue', 'Impact', 'sans-serif'],
       },
       fontSize: {
         xs: '0.75rem',

@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { JetBrains_Mono, Bebas_Neue } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
+const bebasNeue = Bebas_Neue({ subsets: ['latin'], weight: '400', variable: '--font-display' })
 
 export const metadata: Metadata = {
   title: 'get-right.church | Political Engagement Platform',
@@ -31,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${jetbrainsMono.variable} ${bebasNeue.variable}`}>
       <body className="antialiased">
         {children}
       </body>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { UpdatePortraitRequest, UpdatePortraitResponse, GetPortraitResponse } from '@/lib/api-types'
 
 export async function POST(
   request: NextRequest,
@@ -30,7 +31,7 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { portrait_url, portrait_style } = body
+    const { portrait_url, portrait_style } = body as UpdatePortraitRequest
 
     // Update politician with portrait
     const { error } = await supabase
@@ -43,7 +44,7 @@ export async function POST(
 
     if (error) throw error
 
-    return NextResponse.json(
+    return NextResponse.json<UpdatePortraitResponse>(
       {
         success: true,
         message: 'Portrait updated',
@@ -76,7 +77,7 @@ export async function GET(
 
     if (error) throw error
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json<GetPortraitResponse>(data, { status: 200 })
   } catch (error) {
     console.error('Fetch portrait error:', error)
     return NextResponse.json(
