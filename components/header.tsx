@@ -79,11 +79,11 @@ export function Header() {
           style={{ gap: '0.125rem', alignItems: 'center' }}
         >
           {[
-            { href: '/politicians', label: 'Politicians' },
-            { href: '/issues', label: 'Issues' },
-            { href: '/geographies', label: 'Geography' },
-            { href: '/the-talk', label: 'The Talk' },
-            { href: '/blunch', label: 'Blunch' },
+            { href: '/politicians', label: 'Politicians', accent: false },
+            { href: '/issues', label: 'Issues', accent: true },
+            { href: '/geographies', label: 'Geography', accent: false },
+            { href: '/the-talk', label: 'The Talk', accent: false },
+            { href: '/blunch', label: 'Blunch', accent: false },
           ].map((item) => (
             <Link
               key={item.href}
@@ -94,9 +94,12 @@ export function Header() {
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
+                color: item.accent ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 borderRadius: '2px',
                 transition: 'color 0.15s ease, background 0.15s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement
@@ -105,10 +108,22 @@ export function Header() {
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.color = 'var(--text-secondary)'
+                el.style.color = item.accent ? 'var(--accent-primary)' : 'var(--text-secondary)'
                 el.style.background = 'transparent'
               }}
             >
+              {item.accent && (
+                <span
+                  style={{
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-primary)',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               {item.label}
             </Link>
           ))}

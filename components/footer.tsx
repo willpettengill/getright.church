@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -102,49 +104,60 @@ export function Footer() {
             </p>
           </div>
 
-          {[
-            {
-              heading: 'Explore',
-              links: [
+          {/* Explore column */}
+          <div>
+            <p className="footer-col-heading">Explore</p>
+            <ul className="footer-links">
+              {[
                 { label: 'Politicians', href: '/politicians' },
+                { label: 'Issues', href: '/issues' },
                 { label: 'Geography', href: '/geographies' },
                 { label: 'The Talk', href: '/the-talk' },
                 { label: 'Blunch', href: '/blunch' },
-              ],
-            },
-            {
-              heading: 'Platform',
-              links: [
-                { label: 'About', href: '#' },
-                { label: 'Mission', href: '#' },
-                { label: 'Contact', href: '#' },
-              ],
-            },
-            {
-              heading: 'Legal',
-              links: [
-                { label: 'Terms', href: '#' },
-                { label: 'Privacy', href: '#' },
-                { label: 'Cookies', href: '#' },
-              ],
-            },
-          ].map((col) => (
-            <div key={col.heading}>
-              <p className="footer-col-heading">{col.heading}</p>
-              <ul className="footer-links">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} className="footer-link">{link.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+              ].map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="footer-link">{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Platform column */}
+          <div>
+            <p className="footer-col-heading">Platform</p>
+            <ul className="footer-links">
+              <li>
+                <Link href="/about" className="footer-link">About</Link>
+              </li>
+              <li>
+                <Link href="/" className="footer-link">Mission</Link>
+              </li>
+              <li>
+                <a href="mailto:hello@getright.church" className="footer-link">Contact</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal column */}
+          <div>
+            <p className="footer-col-heading">Legal</p>
+            <ul className="footer-links">
+              <li>
+                <Link href="/legal/terms" className="footer-link">Terms</Link>
+              </li>
+              <li>
+                <Link href="/legal/privacy" className="footer-link">Privacy</Link>
+              </li>
+              <li>
+                <Link href="/legal/cookies" className="footer-link">Cookies</Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © 2024 GET-RIGHT.CHURCH — BUILT WITH INTENTION.
+            © 2026 GET-RIGHT.CHURCH — BUILT WITH INTENTION.
           </p>
           <div className="footer-live">
             <span className="footer-live-dot animate-pulse-dot" />
