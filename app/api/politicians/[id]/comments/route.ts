@@ -40,7 +40,7 @@ export async function POST(
 
     if (error) throw error
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json({ comment: data?.[0] }, { status: 201 })
   } catch (error) {
     console.error('Comment creation error:', error)
     return NextResponse.json(
@@ -69,7 +69,7 @@ export async function GET(
 
     if (error) throw error
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json({ comments: data ?? [] }, { status: 200 })
   } catch (error) {
     console.error('Fetch comments error:', error)
     return NextResponse.json(

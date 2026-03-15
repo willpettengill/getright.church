@@ -221,6 +221,35 @@ export async function getIssuePositions(issueId: string): Promise<IssuePositionW
   return (data ?? []) as IssuePositionWithPolitician[]
 }
 
+export async function getPoliticiansCount(): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from('politicians')
+    .select('*', { count: 'exact', head: true })
+  return count ?? 0
+}
+
+export async function getPostsCount(): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+  return count ?? 0
+}
+
+type RawIssuePositionRow = {
+  position: string
+  notes: string | null
+  issue: {
+    id: string
+    title: string
+    slug: string
+    category: string
+    description: string | null
+    created_at: string
+  } | null
+}
+
 export async function getPoliticianIssuePositions(politicianId: string): Promise<PoliticianIssue[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -237,9 +266,9 @@ export async function getPoliticianIssuePositions(politicianId: string): Promise
     return []
   }
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? [] as unknown as RawIssuePositionRow[]).map((row) => ({
     ...row.issue,
     position: row.position,
     notes: row.notes,
-  })) as PoliticianIssue[]
+  })) as unknown as PoliticianIssue[]
 }

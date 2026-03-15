@@ -4,6 +4,7 @@ import { Footer } from '@/components/footer'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { IssuePositionWithPolitician } from '@/lib/types'
+import { getCategoryColor } from '@/lib/issue-utils'
 
 export const revalidate = 3600
 
@@ -18,19 +19,6 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   } catch {
     return { title: 'Not Found' }
   }
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'civil-rights': '#40916c',
-  'civil rights': '#40916c',
-  economy: '#f59e0b',
-  environment: '#4ade80',
-  healthcare: '#60a5fa',
-}
-
-function getCategoryColor(category: string): string {
-  const key = category.toLowerCase()
-  return CATEGORY_COLORS[key] ?? 'var(--text-tertiary)'
 }
 
 function positionStyle(position: string) {
@@ -210,14 +198,6 @@ export default async function IssueDetailPage(props: { params: Promise<{ slug: s
         .pos-card:hover { background: var(--bg-tertiary) !important; }
         .issue-breadcrumb { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 0.375rem; transition: color 0.15s ease; }
         .issue-breadcrumb:hover { color: var(--accent-primary); }
-        @keyframes fill-bar {
-          from { width: 0; }
-          to { width: var(--target-w); }
-        }
-        .poll-fill {
-          animation: fill-bar 1s cubic-bezier(0.16,1,0.3,1) both;
-          width: var(--target-w);
-        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 
@@ -335,19 +315,19 @@ export default async function IssueDetailPage(props: { params: Promise<{ slug: s
                 >
                   {issue.support_count > 0 && (
                     <div
-                      className="poll-fill"
+                      className="poll-fill-slow"
                       style={{ '--target-w': `${supportPct}%`, background: 'var(--status-positive)', animationDelay: '0s' } as React.CSSProperties}
                     />
                   )}
                   {issue.oppose_count > 0 && (
                     <div
-                      className="poll-fill"
+                      className="poll-fill-slow"
                       style={{ '--target-w': `${opposePct}%`, background: 'var(--status-negative)', animationDelay: '0.15s' } as React.CSSProperties}
                     />
                   )}
                   {neutralPct > 0 && (
                     <div
-                      className="poll-fill"
+                      className="poll-fill-slow"
                       style={{ '--target-w': `${neutralPct}%`, background: 'var(--neutral-mid)', animationDelay: '0.3s' } as React.CSSProperties}
                     />
                   )}

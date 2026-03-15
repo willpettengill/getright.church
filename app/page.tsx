@@ -2,14 +2,14 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { PulseFeed } from '@/components/pulse-feed'
 import Link from 'next/link'
-import { getPoliticians, getIssues, getGeographies, getPosts } from '@/lib/api'
+import { getPoliticiansCount, getIssues, getGeographies, getPostsCount } from '@/lib/api'
 
 export default async function Home() {
-  const [politicians, issues, geographies, posts] = await Promise.all([
-    getPoliticians(undefined, 500),
+  const [politiciansCount, issues, geographies, postsCount] = await Promise.all([
+    getPoliticiansCount(),
     getIssues(),
     getGeographies(),
-    getPosts(undefined, undefined, 500),
+    getPostsCount(),
   ])
 
   return (
@@ -189,10 +189,10 @@ export default async function Home() {
             }}
           >
             {[
-              { value: politicians.length, label: 'Politicians Tracked', sub: 'and counting' },
+              { value: politiciansCount,   label: 'Politicians Tracked', sub: 'and counting' },
               { value: issues.length,      label: 'Issues Tracked',      sub: 'active issues' },
               { value: geographies.length, label: 'Geographies',         sub: 'regions covered' },
-              { value: posts.length,       label: 'Community Posts',     sub: 'from the movement' },
+              { value: postsCount,         label: 'Community Posts',     sub: 'from the movement' },
             ].map((stat, i) => (
               <div
                 key={stat.label}

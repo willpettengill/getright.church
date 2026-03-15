@@ -3,23 +3,11 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import Link from 'next/link'
 import type { IssueWithVotes } from '@/lib/types'
+import { getCategoryColor } from '@/lib/issue-utils'
 
 export const metadata = {
   title: 'Issues | get-right.church',
   description: 'Track where politicians and the community stand on key issues',
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'civil-rights': '#40916c',
-  'civil rights': '#40916c',
-  economy: '#f59e0b',
-  environment: '#4ade80',
-  healthcare: '#60a5fa',
-}
-
-function getCategoryColor(category: string): string {
-  const key = category.toLowerCase()
-  return CATEGORY_COLORS[key] ?? 'var(--text-tertiary)'
 }
 
 function PollBar({ issue }: { issue: IssueWithVotes }) {
@@ -104,14 +92,6 @@ export default async function IssuesPage() {
       <style>{`
         .issue-card:hover { background: var(--bg-tertiary) !important; }
         .issue-cat-link:hover { color: var(--accent-primary) !important; }
-        @keyframes fill-bar {
-          from { width: 0; }
-          to { width: var(--target-w); }
-        }
-        .poll-fill {
-          animation: fill-bar 0.8s var(--ease-out-expo, cubic-bezier(0.16,1,0.3,1)) both;
-          width: var(--target-w);
-        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 

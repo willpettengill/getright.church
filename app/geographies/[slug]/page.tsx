@@ -70,14 +70,6 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
       <Header />
       <style>{`
         .geo-post-item:hover { background: var(--bg-tertiary) !important; }
-        @keyframes fill-bar {
-          from { width: 0; }
-          to { width: var(--target-w); }
-        }
-        .demo-bar {
-          animation: fill-bar 0.7s cubic-bezier(0.16,1,0.3,1) both;
-          width: var(--target-w);
-        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 

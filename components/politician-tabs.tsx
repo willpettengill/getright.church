@@ -44,11 +44,18 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
     }))
 
     try {
-      await fetch(`/api/politicians/${politicianId}/comments/${commentId}/vote`, {
+      const result = await fetch(`/api/politicians/${politicianId}/comments/${commentId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ direction }),
       })
+      if (result.ok) {
+        const serverData = await result.json() as { upvotes: number; downvotes: number }
+        setVoteCounts((prev) => ({
+          ...prev,
+          [commentId]: { upvotes: serverData.upvotes, downvotes: serverData.downvotes },
+        }))
+      }
     } catch {
       setVoteCounts((prev) => ({ ...prev, [commentId]: current }))
     }
