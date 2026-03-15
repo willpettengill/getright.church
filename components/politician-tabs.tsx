@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Post, Vote, Comment, PoliticianIssue } from '@/lib/types'
 import { CommentForm } from '@/components/comment-form'
 
@@ -21,6 +22,7 @@ const PLATFORM_COLORS: Record<string, string> = {
 }
 
 export function PoliticianTabs({ posts, votes, comments, politicianId, issuePositions }: PoliticianTabsProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('feed')
   const [voteCounts, setVoteCounts] = useState<Record<string, { upvotes: number; downvotes: number }>>({})
 
@@ -261,7 +263,7 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
           <div style={{ padding: '1.5rem 0', marginBottom: '0.5rem' }}>
             <CommentForm
               politicianId={politicianId}
-              onCommentAdded={() => window.location.reload()}
+              onCommentAdded={() => router.refresh()}
             />
           </div>
           <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 1px' }} />
