@@ -70,6 +70,14 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
       <Header />
       <style>{`
         .geo-post-item:hover { background: var(--bg-tertiary) !important; }
+        @keyframes fill-bar {
+          from { width: 0; }
+          to { width: var(--target-w); }
+        }
+        .demo-bar {
+          animation: fill-bar 0.7s cubic-bezier(0.16,1,0.3,1) both;
+          width: var(--target-w);
+        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 
@@ -221,46 +229,7 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
 
                 {/* Last Election Results */}
                 {(geography.last_result_dem_pct != null || geography.last_result_rep_pct != null) && (
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                      {geography.last_result_dem_pct != null && (
-                        <span
-                          style={{
-                            fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                            fontSize: '2rem',
-                            letterSpacing: '0.03em',
-                            color: '#60a5fa',
-                            lineHeight: 1,
-                          }}
-                        >
-                          {geography.last_result_dem_pct.toFixed(1)}%
-                        </span>
-                      )}
-                      {geography.last_result_dem_pct != null && geography.last_result_rep_pct != null && (
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            color: 'var(--text-faint)',
-                            fontWeight: 700,
-                          }}
-                        >
-                          /
-                        </span>
-                      )}
-                      {geography.last_result_rep_pct != null && (
-                        <span
-                          style={{
-                            fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                            fontSize: '2rem',
-                            letterSpacing: '0.03em',
-                            color: '#f87171',
-                            lineHeight: 1,
-                          }}
-                        >
-                          {geography.last_result_rep_pct.toFixed(1)}%
-                        </span>
-                      )}
-                    </div>
+                  <div style={{ minWidth: '200px' }}>
                     <p
                       style={{
                         fontSize: '10px',
@@ -268,10 +237,81 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
                         color: 'var(--text-tertiary)',
+                        marginBottom: '0.75rem',
                       }}
                     >
-                      DEM / REP{geography.last_election_year ? ` (${geography.last_election_year})` : ''}
+                      Last Election{geography.last_election_year ? ` (${geography.last_election_year})` : ''}
                     </p>
+
+                    {geography.last_result_dem_pct != null && (
+                      <div style={{ marginBottom: '0.625rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3rem' }}>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: '#60a5fa',
+                            }}
+                          >
+                            DEM
+                          </span>
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '1.25rem',
+                              letterSpacing: '0.03em',
+                              color: '#60a5fa',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {geography.last_result_dem_pct.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div style={{ height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div
+                            className="demo-bar"
+                            style={{ '--target-w': `${geography.last_result_dem_pct}%`, height: '100%', background: '#60a5fa', animationDelay: '0s' } as React.CSSProperties}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {geography.last_result_rep_pct != null && (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3rem' }}>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: '#f87171',
+                            }}
+                          >
+                            REP
+                          </span>
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '1.25rem',
+                              letterSpacing: '0.03em',
+                              color: '#f87171',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {geography.last_result_rep_pct.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div style={{ height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div
+                            className="demo-bar"
+                            style={{ '--target-w': `${geography.last_result_rep_pct}%`, height: '100%', background: '#f87171', animationDelay: '0.15s' } as React.CSSProperties}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
