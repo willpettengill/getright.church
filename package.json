@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > lib/database.types.ts"
+    "gen:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > lib/database.types.ts",
+    "seed": "npx tsx scripts/seed-v2.ts"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -21,6 +22,8 @@
   },
   "devDependencies": {
     "typescript": "^5.3.3",
+    "tsx": "^4.19.2",
+    "dotenv": "^16.4.7",
     "@types/node": "^20.10.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

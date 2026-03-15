@@ -51,6 +51,13 @@ export type IssuePositionInsert = Database['public']['Tables']['politician_issue
 export type IssueVote = Database['public']['Tables']['issue_votes']['Row']
 export type IssueVoteInsert = Database['public']['Tables']['issue_votes']['Insert']
 
+export type Bill = Database['public']['Tables']['bills']['Row']
+export type BillInsert = Database['public']['Tables']['bills']['Insert']
+export type BillUpdate = Database['public']['Tables']['bills']['Update']
+
+export type PoliticianSimilarity = Database['public']['Tables']['politician_similarities']['Row']
+export type PoliticianSimilarityInsert = Database['public']['Tables']['politician_similarities']['Insert']
+
 // Issue with community vote totals
 export type IssueWithVotes = Issue & {
   support_count: number

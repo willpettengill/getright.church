@@ -1,6 +1,6 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { getPolitician, getPosts, getComments, getVotes, getPoliticianIssuePositions } from '@/lib/api'
+import { getPolitician, getPosts, getComments, getVotes, getPoliticianIssuePositions, getSimilarPoliticians, getPoliticianNetwork } from '@/lib/api'
 import { PoliticianTabs } from '@/components/politician-tabs'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -29,11 +29,13 @@ export default async function PoliticianPage(props: { params: Promise<{ slug: st
     notFound()
   }
 
-  const [posts, comments, votes, issuePositions] = await Promise.all([
+  const [posts, comments, votes, issuePositions, similarPoliticians, network] = await Promise.all([
     getPosts(politician.geography_id ?? undefined, politician.id, 10),
     getComments(politician.id, 15),
     getVotes(politician.id, 10),
     getPoliticianIssuePositions(politician.id),
+    getSimilarPoliticians(politician.id, 5),
+    getPoliticianNetwork(politician.id),
   ])
 
   const isEndorsed = politician.endorsement_status === 'endorsed'
@@ -270,13 +272,46 @@ export default async function PoliticianPage(props: { params: Promise<{ slug: st
                       sub: politician.is_squid ? 'flagged squid' : 'not a squid',
                       color: politician.is_squid ? 'var(--status-negative)' : (politician.is_squid === false ? 'var(--status-positive)' : 'var(--text-tertiary)'),
                     },
+                    {
+                      label: 'Party Line',
+                      value: politician.party_line_score != null ? politician.party_line_score.toFixed(0) : '—',
+                      sub: 'higher = more loyal',
+                      color: politician.party_line_score != null
+                        ? (politician.party_line_score > 75 ? 'var(--status-negative)' : politician.party_line_score < 40 ? 'var(--status-positive)' : 'var(--text-secondary)')
+                        : 'var(--text-tertiary)',
+                    },
+                    {
+                      label: 'Bipartisan',
+                      value: politician.bipartisan_score != null ? politician.bipartisan_score.toFixed(0) : '—',
+                      sub: 'cross-aisle votes',
+                      color: politician.bipartisan_score != null
+                        ? (politician.bipartisan_score > 20 ? 'var(--status-positive)' : 'var(--text-secondary)')
+                        : 'var(--text-tertiary)',
+                    },
+                    {
+                      label: 'Independence',
+                      value: politician.independence_score != null ? politician.independence_score.toFixed(0) : '—',
+                      sub: 'deviates from party',
+                      color: politician.independence_score != null
+                        ? (politician.independence_score > 30 ? 'var(--accent-primary)' : 'var(--text-secondary)')
+                        : 'var(--text-tertiary)',
+                    },
+                    {
+                      label: 'Consistency',
+                      value: politician.consistency_score != null ? politician.consistency_score.toFixed(0) : '—',
+                      sub: 'positions vs record',
+                      color: politician.consistency_score != null
+                        ? (politician.consistency_score > 70 ? 'var(--status-positive)' : 'var(--text-secondary)')
+                        : 'var(--text-tertiary)',
+                    },
                   ].map((item, i) => (
                     <div
                       key={item.label}
                       style={{
                         padding: '1rem',
                         background: 'var(--bg-secondary)',
-                        borderLeft: i > 0 ? '1px solid var(--border)' : 'none',
+                        borderLeft: (i % 4) > 0 ? '1px solid var(--border)' : 'none',
+                        borderTop: i >= 4 ? '1px solid var(--border)' : 'none',
                       }}
                     >
                       <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: '0.5rem' }}>
@@ -332,6 +367,52 @@ export default async function PoliticianPage(props: { params: Promise<{ slug: st
             </div>
           )}
 
+          {/* Similar Politicians */}
+          {similarPoliticians.length > 0 && (
+            <div style={{ marginBottom: '2.5rem' }}>
+              <p className="section-label" style={{ marginBottom: '1rem' }}>Similar Voting Record</p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '1px',
+                background: 'var(--border)',
+              }}>
+                {similarPoliticians.map((sim) => (
+                  <a
+                    key={sim.id}
+                    href={`/politicians/${sim.slug}`}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      padding: '1rem',
+                      textDecoration: 'none',
+                      display: 'block',
+                      transition: 'background 0.1s ease',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-tertiary)' }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-secondary)' }}
+                  >
+                    <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', letterSpacing: '0.02em' }}>
+                      {sim.name}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {sim.party && (
+                        <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: sim.party === 'Democrat' ? '#60A5FA' : sim.party === 'Republican' ? '#F87171' : 'var(--text-tertiary)', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', padding: '0.1rem 0.4rem', borderRadius: '2px' }}>
+                          {sim.party === 'Democrat' ? 'D' : sim.party === 'Republican' ? 'R' : 'I'}
+                        </span>
+                      )}
+                      {sim.state_abbrev && (
+                        <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>{sim.state_abbrev}</span>
+                      )}
+                      <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.06em', marginLeft: 'auto' }}>
+                        {(sim.similarity * 100).toFixed(0)}% match
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Tabs */}
           <PoliticianTabs
             posts={posts}
@@ -339,6 +420,7 @@ export default async function PoliticianPage(props: { params: Promise<{ slug: st
             comments={comments}
             politicianId={politician.id}
             issuePositions={issuePositions}
+            network={network}
           />
         </div>
 
