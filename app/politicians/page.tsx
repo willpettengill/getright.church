@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { PoliticianCard } from '@/components/politician-card'
@@ -119,20 +120,17 @@ export default async function PoliticiansPage() {
                       .sort((a, b) => (b.aggregate_sentiment ?? 0) - (a.aggregate_sentiment ?? 0))
                       .slice(0, 3)
                       .map((p, i) => (
-                        <div
+                        <Link
                           key={p.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.875rem',
-                          }}
+                          href={`/politicians/${p.slug}`}
+                          style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.875rem', cursor: 'pointer' }}
                         >
                           <span
                             style={{
                               fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                              fontSize: '1.5rem',
+                              fontSize: '2rem',
                               letterSpacing: '0.04em',
-                              color: 'var(--text-faint)',
+                              color: 'var(--text-tertiary)',
                               lineHeight: 1,
                               width: '28px',
                               flexShrink: 0,
@@ -140,6 +138,41 @@ export default async function PoliticiansPage() {
                           >
                             {String(i + 1).padStart(2, '0')}
                           </span>
+                          {/* Portrait thumbnail */}
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '2px',
+                              overflow: 'hidden',
+                              background: 'var(--bg-tertiary)',
+                              flexShrink: 0,
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            {p.portrait_url ? (
+                              <img
+                                src={p.portrait_url}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                              />
+                            ) : (
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                                  fontSize: '0.875rem',
+                                  color: 'var(--text-faint)',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                {p.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <p
                               style={{
@@ -186,7 +219,7 @@ export default async function PoliticiansPage() {
                           >
                             Endorsed
                           </span>
-                        </div>
+                        </Link>
                       ))}
                     {politicians.filter((p) => p.endorsement_status === 'endorsed').length === 0 && (
                       <p
@@ -224,20 +257,17 @@ export default async function PoliticiansPage() {
                       .sort((a, b) => (b.epstein_score ?? 0) - (a.epstein_score ?? 0))
                       .slice(0, 3)
                       .map((p, i) => (
-                        <div
+                        <Link
                           key={p.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.875rem',
-                          }}
+                          href={`/politicians/${p.slug}`}
+                          style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.875rem', cursor: 'pointer' }}
                         >
                           <span
                             style={{
                               fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                              fontSize: '1.5rem',
+                              fontSize: '2rem',
                               letterSpacing: '0.04em',
-                              color: 'var(--text-faint)',
+                              color: 'var(--text-tertiary)',
                               lineHeight: 1,
                               width: '28px',
                               flexShrink: 0,
@@ -245,6 +275,41 @@ export default async function PoliticiansPage() {
                           >
                             {String(i + 1).padStart(2, '0')}
                           </span>
+                          {/* Portrait thumbnail */}
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '2px',
+                              overflow: 'hidden',
+                              background: 'var(--bg-tertiary)',
+                              flexShrink: 0,
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            {p.portrait_url ? (
+                              <img
+                                src={p.portrait_url}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                              />
+                            ) : (
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                                  fontSize: '0.875rem',
+                                  color: 'var(--text-faint)',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                {p.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <p
                               style={{
@@ -289,7 +354,7 @@ export default async function PoliticiansPage() {
                           >
                             Anti
                           </span>
-                        </div>
+                        </Link>
                       ))}
                     {politicians.filter((p) => p.endorsement_status === 'anti-endorsed').length === 0 && (
                       <p
