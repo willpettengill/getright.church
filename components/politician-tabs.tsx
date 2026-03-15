@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Post, Vote, Comment, PoliticianIssue } from '@/lib/types'
 import { CommentForm } from '@/components/comment-form'
+import type { NetworkGraphResponse } from '@/lib/api-types'
 
 interface PoliticianTabsProps {
   posts: Post[]
@@ -11,9 +12,10 @@ interface PoliticianTabsProps {
   comments: Comment[]
   politicianId: string
   issuePositions?: PoliticianIssue[]
+  network?: NetworkGraphResponse
 }
 
-type Tab = 'feed' | 'votes' | 'community' | 'issues'
+type Tab = 'feed' | 'votes' | 'community' | 'issues' | 'network'
 
 const PLATFORM_COLORS: Record<string, string> = {
   twitter: '#1DA1F2',
@@ -21,7 +23,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   tiktok: '#69C9D0',
 }
 
-export function PoliticianTabs({ posts, votes, comments, politicianId, issuePositions }: PoliticianTabsProps) {
+export function PoliticianTabs({ posts, votes, comments, politicianId, issuePositions, network }: PoliticianTabsProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('feed')
   const [voteCounts, setVoteCounts] = useState<Record<string, { upvotes: number; downvotes: number }>>({})
@@ -66,6 +68,7 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
     { id: 'votes',     label: 'Voting Record',  count: votes.length },
     { id: 'community', label: 'Community',      count: comments.length },
     { id: 'issues',    label: 'Issues',         count: (issuePositions ?? []).length },
+    { id: 'network',   label: 'Network',        count: (network?.edges ?? []).length },
   ]
 
   return (
@@ -384,6 +387,67 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
                     <span style={{ flexShrink: 0, padding: '0.3rem 0.75rem', background: posBg, border: `1px solid ${posBorder}`, borderRadius: '2px', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: posColor }}>
                       {ip.position}
                     </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Network ── */}
+      {activeTab === 'network' && (
+        <div>
+          {(network?.edges ?? []).length === 0 ? (
+            <EmptyState message="No network data" />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+              {(network?.edges ?? []).map((edge, i) => {
+                const entity = network?.nodes.find(n => n.id === edge.source && n.node_type === 'entity')
+                if (!entity) return null
+                const typeColors: Record<string, string> = {
+                  pac: '#F59E0B',
+                  corporation: '#60A5FA',
+                  ngo: '#34D399',
+                  industry: '#A78BFA',
+                }
+                const typeColor = typeColors[entity.type] ?? 'var(--text-tertiary)'
+                return (
+                  <div
+                    key={`${edge.source}-${edge.relationship_type}`}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      padding: '1rem 1.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      justifyContent: 'space-between',
+                      transition: 'background 0.1s ease',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary)' }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-secondary)' }}
+                  >
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.3rem', letterSpacing: '0.01em' }}>
+                        {entity.name}
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: typeColor, background: 'var(--bg-tertiary)', border: '1px solid var(--border)', padding: '0.1rem 0.4rem', borderRadius: '2px' }}>
+                          {entity.type}
+                        </span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
+                          {edge.relationship_type.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    </div>
+                    {edge.weight != null && (
+                      <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                        <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.5rem', letterSpacing: '0.03em', color: 'var(--accent-primary)', lineHeight: 1 }}>
+                          ${edge.weight.toFixed(1)}M
+                        </p>
+                        <p style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '0.2rem' }}>Donation</p>
+                      </div>
+                    )}
                   </div>
                 )
               })}

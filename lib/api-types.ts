@@ -2,6 +2,7 @@ import type {
   Comment,
   PostInsert,
   VoteInsert,
+  Bill,
 } from './types'
 
 // POST /api/ingest
@@ -87,3 +88,52 @@ export interface CommentVoteResponse {
   upvotes: number
   downvotes: number
 }
+
+// ── Score System ──────────────────────────────────────────────────────────────
+
+export interface SimilarPoliticianResponse {
+  id: string
+  name: string
+  slug: string
+  party: string | null
+  portrait_url: string | null
+  state_abbrev: string | null
+  chamber: string | null
+  similarity: number
+  shared_votes: number
+}
+
+export interface NetworkNode {
+  id: string
+  name: string
+  type: string           // entity type or 'politician'
+  node_type: 'politician' | 'entity'
+}
+
+export interface NetworkEdge {
+  source: string         // entity id
+  target: string         // politician id
+  relationship_type: string
+  weight: number | null
+}
+
+export interface NetworkGraphResponse {
+  nodes: NetworkNode[]
+  edges: NetworkEdge[]
+}
+
+export interface ScoreLeaderboardEntry {
+  id: string
+  name: string
+  slug: string
+  party: string | null
+  state_abbrev: string | null
+  chamber: string | null
+  endorsement_status: string
+  score_value: number
+}
+
+export type BillResponse = Pick<
+  Bill,
+  'id' | 'bill_id' | 'name' | 'description' | 'policy_category' | 'chamber' | 'congress' | 'vote_date' | 'party_position_dem' | 'party_position_rep' | 'is_bipartisan'
+>

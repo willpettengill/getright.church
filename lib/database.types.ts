@@ -74,6 +74,15 @@ export interface Database {
           epstein_score: number | null
           blunch: boolean | null
           is_squid: boolean | null
+          party_line_score: number | null
+          bipartisan_score: number | null
+          independence_score: number | null
+          district_alignment_score: number | null
+          controversy_score: number | null
+          consistency_score: number | null
+          donor_influence_score: number | null
+          state_abbrev: string | null
+          chamber: string | null
           created_at: string
           updated_at: string
         }
@@ -96,6 +105,15 @@ export interface Database {
           epstein_score?: number | null
           blunch?: boolean | null
           is_squid?: boolean | null
+          party_line_score?: number | null
+          bipartisan_score?: number | null
+          independence_score?: number | null
+          district_alignment_score?: number | null
+          controversy_score?: number | null
+          consistency_score?: number | null
+          donor_influence_score?: number | null
+          state_abbrev?: string | null
+          chamber?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -118,6 +136,15 @@ export interface Database {
           epstein_score?: number | null
           blunch?: boolean | null
           is_squid?: boolean | null
+          party_line_score?: number | null
+          bipartisan_score?: number | null
+          independence_score?: number | null
+          district_alignment_score?: number | null
+          controversy_score?: number | null
+          consistency_score?: number | null
+          donor_influence_score?: number | null
+          state_abbrev?: string | null
+          chamber?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -172,6 +199,8 @@ export interface Database {
           vote_result: string
           policy_category: string | null
           source_url: string | null
+          bill_uuid: string | null
+          party_vote: string | null
           created_at: string
         }
         Insert: {
@@ -183,6 +212,8 @@ export interface Database {
           vote_result: string
           policy_category?: string | null
           source_url?: string | null
+          bill_uuid?: string | null
+          party_vote?: string | null
           created_at?: string
         }
         Update: {
@@ -194,6 +225,8 @@ export interface Database {
           vote_result?: string
           policy_category?: string | null
           source_url?: string | null
+          bill_uuid?: string | null
+          party_vote?: string | null
           created_at?: string
         }
         Relationships: []
@@ -399,6 +432,78 @@ export interface Database {
           position?: string
           notes?: string | null
           created_at?: string
+        }
+        Relationships: []
+      }
+      bills: {
+        Row: {
+          id: string
+          bill_id: string
+          name: string
+          description: string | null
+          policy_category: string
+          chamber: string
+          congress: number | null
+          introduced_date: string | null
+          vote_date: string | null
+          party_position_dem: string | null
+          party_position_rep: string | null
+          is_bipartisan: boolean | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          bill_id: string
+          name: string
+          description?: string | null
+          policy_category: string
+          chamber: string
+          congress?: number | null
+          introduced_date?: string | null
+          vote_date?: string | null
+          party_position_dem?: string | null
+          party_position_rep?: string | null
+          is_bipartisan?: boolean | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          bill_id?: string
+          name?: string
+          description?: string | null
+          policy_category?: string
+          chamber?: string
+          congress?: number | null
+          introduced_date?: string | null
+          vote_date?: string | null
+          party_position_dem?: string | null
+          party_position_rep?: string | null
+          is_bipartisan?: boolean | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      politician_similarities: {
+        Row: {
+          politician_a_id: string
+          politician_b_id: string
+          similarity: number
+          shared_votes: number
+          computed_at: string
+        }
+        Insert: {
+          politician_a_id: string
+          politician_b_id: string
+          similarity: number
+          shared_votes?: number
+          computed_at?: string
+        }
+        Update: {
+          politician_a_id?: string
+          politician_b_id?: string
+          similarity?: number
+          shared_votes?: number
+          computed_at?: string
         }
         Relationships: []
       }

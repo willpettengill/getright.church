@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { PoliticianCard } from '@/components/politician-card'
 import { getPoliticians } from '@/lib/api'
+import { PoliticiansFilterGrid } from '@/components/politicians-filter-grid'
 
 export const metadata = {
   title: 'Politicians | get-right.church',
@@ -371,6 +371,212 @@ export default async function PoliticiansPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Most Bipartisan */}
+                <div style={{ background: 'var(--bg-secondary)', padding: '1.25rem' }}>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      color: '#60A5FA',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    Most Bipartisan
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[...politicians]
+                      .filter((p) => p.bipartisan_score != null)
+                      .sort((a, b) => (b.bipartisan_score ?? 0) - (a.bipartisan_score ?? 0))
+                      .slice(0, 3)
+                      .map((p, i) => (
+                        <div
+                          key={p.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.875rem',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '1.5rem',
+                              letterSpacing: '0.04em',
+                              color: 'var(--text-faint)',
+                              lineHeight: 1,
+                              width: '28px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <p
+                              style={{
+                                fontSize: 'var(--text-sm)',
+                                fontWeight: 700,
+                                color: 'var(--text-primary)',
+                                letterSpacing: '0.02em',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                marginBottom: '0.15rem',
+                              }}
+                            >
+                              {p.name}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '10px',
+                                color: 'var(--text-tertiary)',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              Bipartisan:{' '}
+                              <span style={{ color: '#60A5FA', fontWeight: 700 }}>
+                                {p.bipartisan_score != null ? p.bipartisan_score.toFixed(0) : '—'}
+                              </span>
+                            </p>
+                          </div>
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              padding: '0.2rem 0.5rem',
+                              background: 'rgba(96, 165, 250, 0.06)',
+                              border: '1px solid rgba(96, 165, 250, 0.3)',
+                              borderRadius: '2px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: '#60A5FA',
+                            }}
+                          >
+                            Bipartisan
+                          </span>
+                        </div>
+                      ))}
+                    {politicians.filter((p) => p.bipartisan_score != null).length === 0 && (
+                      <p
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--text-tertiary)',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        No bipartisan score data
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Most Independent */}
+                <div style={{ background: 'var(--bg-secondary)', padding: '1.25rem' }}>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      color: 'var(--accent-primary)',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    Most Independent
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[...politicians]
+                      .filter((p) => p.independence_score != null)
+                      .sort((a, b) => (b.independence_score ?? 0) - (a.independence_score ?? 0))
+                      .slice(0, 3)
+                      .map((p, i) => (
+                        <div
+                          key={p.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.875rem',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '1.5rem',
+                              letterSpacing: '0.04em',
+                              color: 'var(--text-faint)',
+                              lineHeight: 1,
+                              width: '28px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <p
+                              style={{
+                                fontSize: 'var(--text-sm)',
+                                fontWeight: 700,
+                                color: 'var(--text-primary)',
+                                letterSpacing: '0.02em',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                marginBottom: '0.15rem',
+                              }}
+                            >
+                              {p.name}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '10px',
+                                color: 'var(--text-tertiary)',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              Independence:{' '}
+                              <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
+                                {p.independence_score != null ? p.independence_score.toFixed(0) : '—'}
+                              </span>
+                            </p>
+                          </div>
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              padding: '0.2rem 0.5rem',
+                              background: 'var(--accent-glow)',
+                              border: '1px solid var(--accent-primary)',
+                              borderRadius: '2px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: 'var(--accent-primary)',
+                            }}
+                          >
+                            Independent
+                          </span>
+                        </div>
+                      ))}
+                    {politicians.filter((p) => p.independence_score != null).length === 0 && (
+                      <p
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--text-tertiary)',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        No independence score data
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -378,45 +584,7 @@ export default async function PoliticiansPage() {
 
         {/* Grid */}
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 1.25rem' }}>
-
-          {politicians.length > 0 ? (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1px',
-                background: 'var(--border)',
-              }}
-            >
-              {politicians.map((politician) => (
-                <div key={politician.id} style={{ background: 'var(--bg-primary)' }}>
-                  <PoliticianCard politician={politician} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              style={{
-                textAlign: 'center',
-                padding: '6rem 1rem',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 700,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-tertiary)',
-                  marginBottom: '1rem',
-                }}
-              >
-                No politicians in database
-              </p>
-            </div>
-          )}
+          <PoliticiansFilterGrid politicians={politicians} />
         </div>
       </main>
       <Footer />
