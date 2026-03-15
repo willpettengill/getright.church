@@ -78,3 +78,12 @@ export interface IssuePositionResponse {
 export interface IssueVoteRequest {
   vote: 'support' | 'oppose' | 'neutral'
 }
+
+// POST /api/politicians/[id]/comments/[commentId]/vote
+export interface CommentVoteRequest {
+  direction: 'up' | 'down'
+}
+export interface CommentVoteResponse {
+  upvotes: number
+  downvotes: number
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { Post, Vote, Comment, PoliticianIssue } from '@/lib/types'
+import { CommentForm } from '@/components/comment-form'
 
 interface PoliticianTabsProps {
   posts: Post[]
@@ -19,8 +20,37 @@ const PLATFORM_COLORS: Record<string, string> = {
   tiktok: '#69C9D0',
 }
 
-export function PoliticianTabs({ posts, votes, comments, issuePositions }: PoliticianTabsProps) {
+export function PoliticianTabs({ posts, votes, comments, politicianId, issuePositions }: PoliticianTabsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('feed')
+  const [voteCounts, setVoteCounts] = useState<Record<string, { upvotes: number; downvotes: number }>>({})
+
+  function getVotes(comment: Comment) {
+    return voteCounts[comment.id] ?? { upvotes: comment.upvotes ?? 0, downvotes: comment.downvotes ?? 0 }
+  }
+
+  async function handleVote(commentId: string, direction: 'up' | 'down') {
+    const current = voteCounts[commentId] ?? {
+      upvotes: comments.find((c) => c.id === commentId)?.upvotes ?? 0,
+      downvotes: comments.find((c) => c.id === commentId)?.downvotes ?? 0,
+    }
+    setVoteCounts((prev) => ({
+      ...prev,
+      [commentId]: {
+        upvotes: current.upvotes + (direction === 'up' ? 1 : 0),
+        downvotes: current.downvotes + (direction === 'down' ? 1 : 0),
+      },
+    }))
+
+    try {
+      await fetch(`/api/politicians/${politicianId}/comments/${commentId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction }),
+      })
+    } catch {
+      setVoteCounts((prev) => ({ ...prev, [commentId]: current }))
+    }
+  }
 
   const tabs: { id: Tab; label: string; count: number }[] = [
     { id: 'feed',      label: 'The Feed',       count: posts.length },
@@ -226,89 +256,102 @@ export function PoliticianTabs({ posts, votes, comments, issuePositions }: Polit
 
       {/* ── Community ── */}
       {activeTab === 'community' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
-          {comments.length === 0 ? (
-            <EmptyState message="No community posts yet" />
-          ) : (
-            comments.map((comment) => (
-              <div
-                key={comment.id}
-                style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '1.125rem 1.25rem',
-                  transition: 'background 0.1s ease',
-                }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLDivElement).style.background = 'var(--bg-secondary)'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem', gap: '1rem' }}>
-                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
-                    {comment.user?.username || 'Anonymous'}
-                  </span>
-                  <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em', flexShrink: 0 }}>
-                    {new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
+        <div>
+          {/* Comment form */}
+          <div style={{ padding: '1.5rem 0', marginBottom: '0.5rem' }}>
+            <CommentForm
+              politicianId={politicianId}
+              onCommentAdded={() => window.location.reload()}
+            />
+          </div>
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '0 0 1px' }} />
+          {/* Comments list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
+            {comments.length === 0 ? (
+              <EmptyState message="No community posts yet" />
+            ) : (
+              comments.map((comment) => (
+                <div
+                  key={comment.id}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    padding: '1.125rem 1.25rem',
+                    transition: 'background 0.1s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLDivElement).style.background = 'var(--bg-secondary)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem', gap: '1rem' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>
+                      {comment.user?.username || 'Anonymous'}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em', flexShrink: 0 }}>
+                      {new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.65, letterSpacing: '0.02em', marginBottom: '0.75rem' }}>
+                    {comment.body}
+                  </p>
+                  <div style={{ display: 'flex', gap: '1.25rem' }}>
+                    <button
+                      onClick={() => handleVote(comment.id, 'up')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.375rem',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-tertiary)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--status-positive)'
+                      }}
+                      onMouseLeave={(e) => {
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)'
+                      }}
+                    >
+                      ▲ {getVotes(comment).upvotes}
+                    </button>
+                    <button
+                      onClick={() => handleVote(comment.id, 'down')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.375rem',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-tertiary)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--status-negative)'
+                      }}
+                      onMouseLeave={(e) => {
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)'
+                      }}
+                    >
+                      ▼ {getVotes(comment).downvotes}
+                    </button>
+                  </div>
                 </div>
-                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.65, letterSpacing: '0.02em', marginBottom: '0.75rem' }}>
-                  {comment.body}
-                </p>
-                <div style={{ display: 'flex', gap: '1.25rem' }}>
-                  <button
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.375rem',
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      color: 'var(--text-tertiary)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'color 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--status-positive)'
-                    }}
-                    onMouseLeave={(e) => {
-                      ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)'
-                    }}
-                  >
-                    ▲ {comment.upvotes ?? 0}
-                  </button>
-                  <button
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.375rem',
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      color: 'var(--text-tertiary)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'color 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--status-negative)'
-                    }}
-                    onMouseLeave={(e) => {
-                      ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)'
-                    }}
-                  >
-                    ▼ {comment.downvotes ?? 0}
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       )}
       {/* ── Issues ── */}
