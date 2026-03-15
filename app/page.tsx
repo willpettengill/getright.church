@@ -2,8 +2,16 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { PulseFeed } from '@/components/pulse-feed'
 import Link from 'next/link'
+import { getPoliticians, getIssues, getGeographies, getPosts } from '@/lib/api'
 
-export default function Home() {
+export default async function Home() {
+  const [politicians, issues, geographies, posts] = await Promise.all([
+    getPoliticians(undefined, 500),
+    getIssues(),
+    getGeographies(),
+    getPosts(undefined, undefined, 500),
+  ])
+
   return (
     <>
       <Header />
@@ -15,7 +23,7 @@ export default function Home() {
             position: 'relative',
             overflow: 'hidden',
             borderBottom: '1px solid var(--border)',
-            background: 'linear-gradient(160deg, var(--bg-secondary) 0%, var(--bg-primary) 60%)',
+            background: 'linear-gradient(160deg, #111 0%, var(--bg-primary) 50%)',
           }}
         >
           {/* Scanline overlay */}
@@ -23,17 +31,38 @@ export default function Home() {
             className="scanlines"
             style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.6 }}
           />
-          {/* Radial glow behind headline */}
+          {/* Grain overlay */}
+          <div
+            style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+          >
+            <div className="grain-overlay" style={{ position: 'absolute', inset: 0 }} />
+          </div>
+          {/* Primary radial glow — top-left */}
           <div
             style={{
               position: 'absolute',
               top: '-20%',
               left: '-10%',
-              width: '70vw',
-              height: '70vw',
-              maxWidth: '700px',
-              maxHeight: '700px',
-              background: 'radial-gradient(circle, rgba(64,145,108,0.07) 0%, transparent 65%)',
+              width: '90vw',
+              height: '90vw',
+              maxWidth: '900px',
+              maxHeight: '900px',
+              background: 'radial-gradient(circle, rgba(64,145,108,0.10) 0%, transparent 65%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+          {/* Secondary subtler glow — bottom-right */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-30%',
+              right: '-15%',
+              width: '60vw',
+              height: '60vw',
+              maxWidth: '600px',
+              maxHeight: '600px',
+              background: 'radial-gradient(circle, rgba(64,145,108,0.05) 0%, transparent 65%)',
               pointerEvents: 'none',
               zIndex: 0,
             }}
@@ -45,7 +74,7 @@ export default function Home() {
               zIndex: 1,
               maxWidth: '1280px',
               margin: '0 auto',
-              padding: '5rem 1.25rem 4rem',
+              padding: '7rem 1.25rem 6rem',
             }}
           >
             {/* Eyebrow label */}
@@ -54,7 +83,7 @@ export default function Home() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.625rem',
-                marginBottom: '1.5rem',
+                marginBottom: '1rem',
               }}
             >
               <span
@@ -79,6 +108,16 @@ export default function Home() {
                 Political Intelligence Platform
               </span>
             </div>
+            {/* Decorative radar sweep line */}
+            <div
+              style={{
+                width: '120px',
+                height: '1px',
+                background: 'linear-gradient(90deg, var(--accent-primary), transparent)',
+                marginBottom: '1.5rem',
+                opacity: 0.6,
+              }}
+            />
 
             {/* Main headline */}
             <h1
@@ -90,6 +129,7 @@ export default function Home() {
                 color: 'var(--text-primary)',
                 marginBottom: '0.5rem',
                 maxWidth: '900px',
+                animation: 'slide-up 0.5s var(--ease-out-expo) both',
               }}
             >
               GET
@@ -105,13 +145,23 @@ export default function Home() {
                 lineHeight: 1.7,
                 marginBottom: '2.5rem',
                 letterSpacing: '0.02em',
+                animation: 'slide-up 0.5s var(--ease-out-expo) both',
+                animationDelay: '0.1s',
               }}
             >
               Real-time political sentiment, voter accountability, and endorsement
-              tracking for the movement. Know who's with us and who isn't.
+              tracking for the movement. Know who&apos;s with us and who isn&apos;t.
             </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+                animation: 'slide-up 0.5s var(--ease-out-expo) both',
+                animationDelay: '0.2s',
+              }}
+            >
               <Link href="/politicians" className="btn-primary">
                 Browse Politicians →
               </Link>
@@ -139,16 +189,18 @@ export default function Home() {
             }}
           >
             {[
-              { value: '1,247', label: 'Politicians Tracked', sub: 'and counting' },
-              { value: '45.8K', label: 'Posts Analyzed', sub: 'sentiment signals' },
-              { value: '3,421', label: 'Community Members', sub: 'active participants' },
-              { value: '892',   label: 'Endorsements', sub: 'made by get-right' },
+              { value: politicians.length, label: 'Politicians Tracked', sub: 'and counting' },
+              { value: issues.length,      label: 'Issues Tracked',      sub: 'active issues' },
+              { value: geographies.length, label: 'Geographies',         sub: 'regions covered' },
+              { value: posts.length,       label: 'Community Posts',     sub: 'from the movement' },
             ].map((stat, i) => (
               <div
                 key={stat.label}
                 style={{
                   padding: '2rem 1.5rem',
                   borderLeft: i > 0 ? '1px solid var(--border)' : 'none',
+                  animation: 'fade-in 0.4s ease both',
+                  animationDelay: '0.3s',
                 }}
               >
                 <p
@@ -161,7 +213,7 @@ export default function Home() {
                     marginBottom: '0.375rem',
                   }}
                 >
-                  {stat.value}
+                  {stat.value.toLocaleString()}
                 </p>
                 <p
                   style={{
