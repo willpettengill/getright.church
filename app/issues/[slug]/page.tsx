@@ -210,6 +210,14 @@ export default async function IssueDetailPage(props: { params: Promise<{ slug: s
         .pos-card:hover { background: var(--bg-tertiary) !important; }
         .issue-breadcrumb { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 0.375rem; transition: color 0.15s ease; }
         .issue-breadcrumb:hover { color: var(--accent-primary); }
+        @keyframes fill-bar {
+          from { width: 0; }
+          to { width: var(--target-w); }
+        }
+        .poll-fill {
+          animation: fill-bar 1s cubic-bezier(0.16,1,0.3,1) both;
+          width: var(--target-w);
+        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 
@@ -317,8 +325,8 @@ export default async function IssueDetailPage(props: { params: Promise<{ slug: s
                 {/* Large poll bar */}
                 <div
                   style={{
-                    height: '12px',
-                    borderRadius: '2px',
+                    height: '20px',
+                    borderRadius: '3px',
                     background: 'var(--bg-tertiary)',
                     overflow: 'hidden',
                     display: 'flex',
@@ -327,26 +335,20 @@ export default async function IssueDetailPage(props: { params: Promise<{ slug: s
                 >
                   {issue.support_count > 0 && (
                     <div
-                      style={{
-                        width: `${supportPct}%`,
-                        background: 'var(--status-positive)',
-                      }}
+                      className="poll-fill"
+                      style={{ '--target-w': `${supportPct}%`, background: 'var(--status-positive)', animationDelay: '0s' } as React.CSSProperties}
                     />
                   )}
                   {issue.oppose_count > 0 && (
                     <div
-                      style={{
-                        width: `${opposePct}%`,
-                        background: 'var(--status-negative)',
-                      }}
+                      className="poll-fill"
+                      style={{ '--target-w': `${opposePct}%`, background: 'var(--status-negative)', animationDelay: '0.15s' } as React.CSSProperties}
                     />
                   )}
                   {neutralPct > 0 && (
                     <div
-                      style={{
-                        width: `${neutralPct}%`,
-                        background: 'var(--neutral-mid)',
-                      }}
+                      className="poll-fill"
+                      style={{ '--target-w': `${neutralPct}%`, background: 'var(--neutral-mid)', animationDelay: '0.3s' } as React.CSSProperties}
                     />
                   )}
                 </div>

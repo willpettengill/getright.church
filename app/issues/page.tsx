@@ -33,7 +33,7 @@ function PollBar({ issue }: { issue: IssueWithVotes }) {
       {/* Bar */}
       <div
         style={{
-          height: '4px',
+          height: '8px',
           borderRadius: '2px',
           background: 'var(--bg-tertiary)',
           overflow: 'hidden',
@@ -43,29 +43,20 @@ function PollBar({ issue }: { issue: IssueWithVotes }) {
       >
         {issue.support_count > 0 && (
           <div
-            style={{
-              width: `${supportPct}%`,
-              background: 'var(--status-positive)',
-              transition: 'width 0.3s ease',
-            }}
+            className="poll-fill"
+            style={{ '--target-w': `${supportPct}%`, background: 'var(--status-positive)' } as React.CSSProperties}
           />
         )}
         {issue.oppose_count > 0 && (
           <div
-            style={{
-              width: `${opposePct}%`,
-              background: 'var(--status-negative)',
-              transition: 'width 0.3s ease',
-            }}
+            className="poll-fill"
+            style={{ '--target-w': `${opposePct}%`, background: 'var(--status-negative)', animationDelay: '0.1s' } as React.CSSProperties}
           />
         )}
         {neutralPct > 0 && issue.total_count > 0 && (
           <div
-            style={{
-              width: `${neutralPct}%`,
-              background: 'var(--neutral-mid)',
-              transition: 'width 0.3s ease',
-            }}
+            className="poll-fill"
+            style={{ '--target-w': `${neutralPct}%`, background: 'var(--neutral-mid)', animationDelay: '0.2s' } as React.CSSProperties}
           />
         )}
       </div>
@@ -113,6 +104,14 @@ export default async function IssuesPage() {
       <style>{`
         .issue-card:hover { background: var(--bg-tertiary) !important; }
         .issue-cat-link:hover { color: var(--accent-primary) !important; }
+        @keyframes fill-bar {
+          from { width: 0; }
+          to { width: var(--target-w); }
+        }
+        .poll-fill {
+          animation: fill-bar 0.8s var(--ease-out-expo, cubic-bezier(0.16,1,0.3,1)) both;
+          width: var(--target-w);
+        }
       `}</style>
       <main style={{ minHeight: '100vh' }}>
 
