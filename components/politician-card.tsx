@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import type { Politician } from '@/lib/types'
 
@@ -59,6 +60,7 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
   const es = endorsementStyles(politician.endorsement_status)
   const sentiment = sentimentDisplay(politician.aggregate_sentiment)
   const epstein = epsteinDisplay(politician.epstein_score)
+  const [hovered, setHovered] = useState(false)
 
   return (
     <Link href={`/politicians/${politician.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
@@ -69,26 +71,20 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
           borderLeft: `2px solid ${es.bar}`,
           borderRadius: '2px',
           overflow: 'hidden',
-          transition: 'border-color 0.15s ease, transform 0.15s ease',
+          transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+          transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+          boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--neutral-mid)' : 'none',
           cursor: 'pointer',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
         }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLDivElement
-          el.style.borderColor = 'var(--neutral-mid)'
-          el.style.borderLeftColor = es.bar
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLDivElement
-          el.style.borderColor = 'var(--border)'
-          el.style.borderLeftColor = es.bar
-        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         {/* Portrait */}
         {politician.portrait_url ? (
-          <div style={{ position: 'relative', paddingBottom: '56.25%', background: 'var(--bg-tertiary)', flexShrink: 0 }}>
+          <div style={{ position: 'relative', paddingBottom: '75%', background: 'var(--bg-tertiary)', flexShrink: 0 }}>
             <img
               src={politician.portrait_url}
               alt={politician.name}
@@ -122,7 +118,7 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
         ) : (
           <div
             style={{
-              height: '140px',
+              height: '200px',
               background: 'var(--bg-tertiary)',
               display: 'flex',
               alignItems: 'center',
@@ -231,7 +227,7 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
               <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: '0.25rem' }}>
                 Sentiment
               </p>
-              <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.375rem', letterSpacing: '0.03em', color: sentiment.color, lineHeight: 1 }}>
+              <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.625rem', letterSpacing: '0.03em', color: sentiment.color, lineHeight: 1 }}>
                 {sentiment.text}
               </p>
             </div>
@@ -241,7 +237,7 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
               <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: '0.25rem' }}>
                 Epstein
               </p>
-              <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.375rem', letterSpacing: '0.03em', color: epstein.color, lineHeight: 1 }}>
+              <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.625rem', letterSpacing: '0.03em', color: epstein.color, lineHeight: 1 }}>
                 {epstein.text}
               </p>
             </div>
@@ -252,28 +248,45 @@ export function PoliticianCard({ politician }: PoliticianCardProps) {
                 Flags
               </p>
               <div style={{ display: 'flex', gap: '0.25rem', flexDirection: 'column' }}>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    color: politician.blunch ? 'var(--status-positive)' : 'var(--text-faint)',
-                  }}
-                >
-                  B:{politician.blunch ? 'Y' : 'N'}
-                </span>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    color: politician.is_squid ? 'var(--status-negative)' : 'var(--text-faint)',
-                  }}
-                >
-                  S:{politician.is_squid ? 'Y' : 'N'}
-                </span>
+                {politician.blunch ? (
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--status-positive)',
+                      background: 'rgba(74, 222, 128, 0.1)',
+                      border: '1px solid rgba(74, 222, 128, 0.35)',
+                      borderRadius: '2px',
+                      padding: '0.1rem 0.3rem',
+                      display: 'inline-block',
+                    }}
+                  >
+                    BLUNCH ✓
+                  </span>
+                ) : null}
+                {politician.is_squid ? (
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--status-negative)',
+                      background: 'rgba(248, 113, 113, 0.1)',
+                      border: '1px solid rgba(248, 113, 113, 0.35)',
+                      borderRadius: '2px',
+                      padding: '0.1rem 0.3rem',
+                      display: 'inline-block',
+                    }}
+                  >
+                    SQUID
+                  </span>
+                ) : null}
+                {!politician.blunch && !politician.is_squid ? (
+                  <span style={{ fontSize: '10px', color: 'var(--text-faint)' }}>—</span>
+                ) : null}
               </div>
             </div>
           </div>
