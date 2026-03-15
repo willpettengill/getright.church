@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { IngestRequest, IngestResponse } from '@/lib/api-types'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as IngestRequest
 
     const supabase = await createClient()
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
       if (votesError) throw votesError
     }
 
-    return NextResponse.json(
+    return NextResponse.json<IngestResponse>(
       {
         success: true,
         posts_ingested: posts?.length || 0,

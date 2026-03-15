@@ -1,8 +1,8 @@
+import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { PoliticianCard } from '@/components/politician-card'
 import { getPoliticians } from '@/lib/api'
-import Link from 'next/link'
 
 export const metadata = {
   title: 'Politicians | get-right.church',
@@ -19,46 +19,402 @@ export default async function PoliticiansPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold font-mono mb-4 text-text-primary">
+      <main style={{ minHeight: '100vh' }}>
+
+        {/* Page header */}
+        <div
+          style={{
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--bg-secondary)',
+            padding: '3rem 0 2.5rem',
+          }}
+        >
+          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.25rem' }}>
+            <p className="section-label" style={{ marginBottom: '0.75rem' }}>Database</p>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                letterSpacing: '0.04em',
+                color: 'var(--text-primary)',
+                lineHeight: 1,
+                marginBottom: '1rem',
+              }}
+            >
               Politicians
             </h1>
-            <p className="text-lg text-text-secondary max-w-2xl">
-              Track politicians by their endorsement status and aggregate community sentiment.
-            </p>
-          </div>
 
-          {/* Filter tabs */}
-          <div className="flex gap-4 mb-12 border-b border-neutral-muted pb-4">
-            <button className="font-mono text-accent-primary border-b-2 border-accent-primary pb-2">
-              All ({politicians.length})
-            </button>
-            <button className="font-mono text-text-secondary hover:text-accent-primary pb-2">
-              Endorsed ({endorsed.length})
-            </button>
-            <button className="font-mono text-text-secondary hover:text-accent-primary pb-2">
-              Opposed ({opposed.length})
-            </button>
-            <button className="font-mono text-text-secondary hover:text-accent-primary pb-2">
-              Watching ({watching.length})
-            </button>
+            {/* Count summary */}
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+              {[
+                { label: 'All', count: politicians.length, color: 'var(--text-secondary)' },
+                { label: 'Endorsed', count: endorsed.length, color: 'var(--status-positive)' },
+                { label: 'Opposed', count: opposed.length, color: 'var(--status-negative)' },
+                { label: 'Watching', count: watching.length, color: 'var(--text-tertiary)' },
+              ].map((item) => (
+                <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                      fontSize: '1.5rem',
+                      letterSpacing: '0.03em',
+                      color: item.color,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {item.count}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 700,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-tertiary)',
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          {/* Politicians grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {politicians.map((politician) => (
-              <PoliticianCard key={politician.id} politician={politician} />
-            ))}
+        {/* Rankings */}
+        {politicians.length > 0 && (
+          <div
+            style={{
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--bg-primary)',
+              padding: '2rem 0',
+            }}
+          >
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.25rem' }}>
+              <p className="section-label" style={{ marginBottom: '1.25rem' }}>Rankings</p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '1px',
+                  background: 'var(--border)',
+                }}
+              >
+                {/* Most Endorsed */}
+                <div style={{ background: 'var(--bg-secondary)', padding: '1.25rem' }}>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      color: 'var(--status-positive)',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    Most Endorsed
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[...politicians]
+                      .filter((p) => p.endorsement_status === 'endorsed')
+                      .sort((a, b) => (b.aggregate_sentiment ?? 0) - (a.aggregate_sentiment ?? 0))
+                      .slice(0, 3)
+                      .map((p, i) => (
+                        <Link
+                          key={p.id}
+                          href={`/politicians/${p.slug}`}
+                          style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.875rem', cursor: 'pointer' }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '2rem',
+                              letterSpacing: '0.04em',
+                              color: 'var(--text-tertiary)',
+                              lineHeight: 1,
+                              width: '28px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          {/* Portrait thumbnail */}
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '2px',
+                              overflow: 'hidden',
+                              background: 'var(--bg-tertiary)',
+                              flexShrink: 0,
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            {p.portrait_url ? (
+                              <img
+                                src={p.portrait_url}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                              />
+                            ) : (
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                                  fontSize: '0.875rem',
+                                  color: 'var(--text-faint)',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                {p.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <p
+                              style={{
+                                fontSize: 'var(--text-sm)',
+                                fontWeight: 700,
+                                color: 'var(--text-primary)',
+                                letterSpacing: '0.02em',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                marginBottom: '0.15rem',
+                              }}
+                            >
+                              {p.name}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '10px',
+                                color: 'var(--text-tertiary)',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              Sentiment:{' '}
+                              <span style={{ color: 'var(--status-positive)', fontWeight: 700 }}>
+                                {p.aggregate_sentiment != null
+                                  ? (p.aggregate_sentiment > 0 ? '+' : '') + p.aggregate_sentiment.toFixed(2)
+                                  : '—'}
+                              </span>
+                            </p>
+                          </div>
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              padding: '0.2rem 0.5rem',
+                              background: 'rgba(74, 222, 128, 0.06)',
+                              border: '1px solid rgba(74, 222, 128, 0.3)',
+                              borderRadius: '2px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: 'var(--status-positive)',
+                            }}
+                          >
+                            Endorsed
+                          </span>
+                        </Link>
+                      ))}
+                    {politicians.filter((p) => p.endorsement_status === 'endorsed').length === 0 && (
+                      <p
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--text-tertiary)',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        No endorsed politicians
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Most Opposed */}
+                <div style={{ background: 'var(--bg-secondary)', padding: '1.25rem' }}>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      color: 'var(--status-negative)',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    Most Opposed
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[...politicians]
+                      .filter((p) => p.endorsement_status === 'anti-endorsed')
+                      .sort((a, b) => (b.epstein_score ?? 0) - (a.epstein_score ?? 0))
+                      .slice(0, 3)
+                      .map((p, i) => (
+                        <Link
+                          key={p.id}
+                          href={`/politicians/${p.slug}`}
+                          style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.875rem', cursor: 'pointer' }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                              fontSize: '2rem',
+                              letterSpacing: '0.04em',
+                              color: 'var(--text-tertiary)',
+                              lineHeight: 1,
+                              width: '28px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          {/* Portrait thumbnail */}
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '2px',
+                              overflow: 'hidden',
+                              background: 'var(--bg-tertiary)',
+                              flexShrink: 0,
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            {p.portrait_url ? (
+                              <img
+                                src={p.portrait_url}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                              />
+                            ) : (
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                                  fontSize: '0.875rem',
+                                  color: 'var(--text-faint)',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                {p.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <p
+                              style={{
+                                fontSize: 'var(--text-sm)',
+                                fontWeight: 700,
+                                color: 'var(--text-primary)',
+                                letterSpacing: '0.02em',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                marginBottom: '0.15rem',
+                              }}
+                            >
+                              {p.name}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: '10px',
+                                color: 'var(--text-tertiary)',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              Epstein:{' '}
+                              <span style={{ color: 'var(--status-negative)', fontWeight: 700 }}>
+                                {p.epstein_score != null ? p.epstein_score.toFixed(0) : '—'}
+                              </span>
+                            </p>
+                          </div>
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              padding: '0.2rem 0.5rem',
+                              background: 'rgba(248, 113, 113, 0.06)',
+                              border: '1px solid rgba(248, 113, 113, 0.3)',
+                              borderRadius: '2px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: 'var(--status-negative)',
+                            }}
+                          >
+                            Anti
+                          </span>
+                        </Link>
+                      ))}
+                    {politicians.filter((p) => p.endorsement_status === 'anti-endorsed').length === 0 && (
+                      <p
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--text-tertiary)',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        No anti-endorsed politicians
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        )}
 
-          {politicians.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-text-tertiary font-mono mb-4">No politicians found</p>
-              <Link href="/" className="text-accent-primary hover:text-accent-light">
-                Return to home
-              </Link>
+        {/* Grid */}
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 1.25rem' }}>
+
+          {politicians.length > 0 ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '1px',
+                background: 'var(--border)',
+              }}
+            >
+              {politicians.map((politician) => (
+                <div key={politician.id} style={{ background: 'var(--bg-primary)' }}>
+                  <PoliticianCard politician={politician} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '6rem 1rem',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 700,
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-tertiary)',
+                  marginBottom: '1rem',
+                }}
+              >
+                No politicians in database
+              </p>
             </div>
           )}
         </div>

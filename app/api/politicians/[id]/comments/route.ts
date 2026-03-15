@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { CreateCommentRequest } from '@/lib/api-types'
 
 export async function POST(
   request: NextRequest,
@@ -7,7 +8,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params
-    const body = await request.json()
+    const body = await request.json() as CreateCommentRequest
 
     const supabase = await createClient()
 
@@ -39,7 +40,7 @@ export async function POST(
 
     if (error) throw error
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json({ comment: data?.[0] }, { status: 201 })
   } catch (error) {
     console.error('Comment creation error:', error)
     return NextResponse.json(
@@ -68,7 +69,7 @@ export async function GET(
 
     if (error) throw error
 
-    return NextResponse.json(data, { status: 200 })
+    return NextResponse.json({ comments: data ?? [] }, { status: 200 })
   } catch (error) {
     console.error('Fetch comments error:', error)
     return NextResponse.json(
