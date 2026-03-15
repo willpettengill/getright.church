@@ -267,11 +267,11 @@ export function Header() {
           }}
         >
           {[
-            { href: '/politicians', label: 'Politicians' },
-            { href: '/issues', label: 'Issues' },
-            { href: '/geographies', label: 'Geography' },
-            { href: '/the-talk', label: 'The Talk' },
-            { href: '/blunch', label: 'Blunch' },
+            { href: '/politicians', label: 'Politicians', accent: false },
+            { href: '/issues', label: 'Issues', accent: true },
+            { href: '/geographies', label: 'Geography', accent: false },
+            { href: '/the-talk', label: 'The Talk', accent: false },
+            { href: '/blunch', label: 'Blunch', accent: false },
           ].map((item) => (
             <Link
               key={item.href}
@@ -283,10 +283,25 @@ export function Header() {
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
+                color: item.accent ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 borderRadius: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem',
               }}
             >
+              {item.accent && (
+                <span
+                  style={{
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-primary)',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               {item.label}
             </Link>
           ))}
