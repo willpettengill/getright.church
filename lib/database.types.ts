@@ -104,7 +104,7 @@ export type Database = {
           endorsement_status?: string
           geography_id?: string | null
           portrait_url?: string | null
-          portrait_style?: string
+          portrait_style?: string | null
           office_held?: string | null
           years_in_office?: number | null
           geography_level?: string | null
@@ -135,7 +135,7 @@ export type Database = {
           endorsement_status?: string
           geography_id?: string | null
           portrait_url?: string | null
-          portrait_style?: string
+          portrait_style?: string | null
           office_held?: string | null
           years_in_office?: number | null
           geography_level?: string | null
@@ -289,15 +289,7 @@ export type Database = {
           role?: string
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "users_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
       comments: {
         Row: {
