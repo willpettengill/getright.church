@@ -161,16 +161,14 @@ export default async function GeographiesPage() {
                         >
                           <div
                             style={{
-                              width: `${demPct}%`,
+                              flex: demPct,
                               background: '#3b82f6',
-                              flexShrink: 0,
                             }}
                           />
                           <div
                             style={{
-                              width: `${repPct}%`,
+                              flex: repPct,
                               background: '#ef4444',
-                              flexShrink: 0,
                             }}
                           />
                         </div>
