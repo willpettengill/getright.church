@@ -1,9 +1,11 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { getGeography, getPoliticians, getPosts } from '@/lib/api'
-import { PoliticianCard } from '@/components/politician-card'
+import { ScoreRow } from '@/components/score-row'
+import { GeographyDetail } from '@/components/geography-detail'
+import { getGeography, getPoliticians, getPosts, getGeographyBills, getSimilarGeographies } from '@/lib/api'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import type { Geography } from '@/lib/types'
 
 export const revalidate = 3600
 
@@ -22,19 +24,19 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
 export default async function GeographyPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params
-  let geography
+  let geography: Geography
   try {
     geography = await getGeography(params.slug)
   } catch {
     notFound()
   }
 
-  const [politicians, posts] = await Promise.all([
+  const [politicians, posts, geographyBills, similarGeos] = await Promise.all([
     getPoliticians(geography.id, 50),
-    getPosts(geography.id, undefined, 15),
+    getPosts(geography.id, undefined, 20),
+    getGeographyBills(geography.id, 20),
+    getSimilarGeographies(geography.political_lean ?? 'swing', geography.id, 6),
   ])
-  const endorsed = politicians.filter((p) => p.endorsement_status === 'endorsed')
-  const opposed = politicians.filter((p) => p.endorsement_status === 'anti-endorsed')
 
   const LEVEL_COLORS: Record<string, string> = {
     federal: 'var(--accent-primary)',
@@ -52,12 +54,6 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
     'purple': '#a78bfa',
   }
 
-  const PLATFORM_COLORS: Record<string, string> = {
-    twitter: '#1DA1F2',
-    instagram: '#E1306C',
-    tiktok: '#69C9D0',
-  }
-
   function formatPopulation(pop: number): string {
     if (pop >= 1_000_000_000) return (pop / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B'
     if (pop >= 1_000_000) return (pop / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
@@ -65,389 +61,222 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
     return pop.toLocaleString()
   }
 
+  const leanColor = geography.political_lean
+    ? (LEAN_COLORS[geography.political_lean.toLowerCase()] ?? null)
+    : null
+
+  const dem = geography.last_result_dem_pct
+  const rep = geography.last_result_rep_pct
+  const margin = dem != null && rep != null ? Math.abs(dem - rep) : null
+
   return (
     <>
       <Header />
-      <style>{`
-        .geo-post-item:hover { background: var(--bg-tertiary) !important; }
-      `}</style>
-      <main style={{ minHeight: '100vh' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <style>{`
+          .detail-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1px; background: var(--border); max-width: 1280px; margin: 0 auto; min-height: calc(100vh - 56px); }
+          @media (max-width: 768px) { .detail-layout { grid-template-columns: 1fr; } }
+          .detail-sidebar { background: var(--bg-secondary); position: sticky; top: 56px; height: fit-content; }
+          @media (max-width: 768px) { .detail-sidebar { position: static; } }
+          .detail-main { background: var(--bg-primary); }
+        `}</style>
 
-        {/* Page header */}
-        <div
-          style={{
-            borderBottom: '1px solid var(--border)',
-            background: 'var(--bg-secondary)',
-            padding: '2rem 0 2.5rem',
-            borderLeft: `3px solid ${levelColor}`,
-          }}
-        >
-          <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.25rem' }}>
-            <div style={{ marginBottom: '1.25rem' }}>
-              <Link
-                href="/geographies"
-                style={{
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-tertiary)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.375rem',
-                  transition: 'color 0.15s ease',
-                }}
-              >
-                ← Geography
-              </Link>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
-              <div>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    color: levelColor,
-                    marginBottom: '0.625rem',
-                  }}
-                >
-                  {geography.type.toUpperCase()} Level
-                </span>
-                <h1
-                  style={{
-                    fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                    fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-                    letterSpacing: '0.04em',
-                    color: 'var(--text-primary)',
-                    lineHeight: 1,
-                  }}
-                >
-                  {geography.name.toUpperCase()}
-                </h1>
-              </div>
-
-              <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-                {[
-                  { value: politicians.length, label: 'Total', color: 'var(--text-secondary)' },
-                  { value: endorsed.length, label: 'Endorsed', color: 'var(--status-positive)' },
-                  { value: opposed.length, label: 'Opposed', color: 'var(--status-negative)' },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <p style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '2rem', letterSpacing: '0.03em', color: s.color, lineHeight: 1 }}>
-                      {s.value}
-                    </p>
-                    <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                      {s.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Breadcrumb bar */}
+        <div style={{ borderBottom: '1px solid var(--border)', padding: '0.625rem 1.25rem' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <Link
+              href="/geographies"
+              style={{
+                fontFamily: 'var(--font-mono), monospace',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--text-tertiary)',
+                textDecoration: 'none',
+              }}
+            >
+              ← Geographies
+            </Link>
           </div>
         </div>
 
-        {/* Demographics Panel */}
-        {geography.population != null && (
-          <div
-            style={{
-              borderBottom: '1px solid var(--border)',
-              background: 'var(--bg-primary)',
-              padding: '1.5rem 0',
-            }}
-          >
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.25rem' }}>
-              <p className="section-label" style={{ marginBottom: '1.25rem' }}>Demographics</p>
-              <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div className="detail-layout">
+          {/* SIDEBAR */}
+          <aside className="detail-sidebar" style={{ padding: '1.25rem' }}>
+            {/* Visual anchor — state abbreviation / name */}
+            <div style={{
+              position: 'relative',
+              padding: '1.5rem',
+              textAlign: 'center',
+              marginBottom: '1rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border)',
+              borderRadius: '2px',
+              overflow: 'hidden',
+            }}>
+              {/* Tinted background */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: leanColor ? `${leanColor}22` : 'transparent',
+                pointerEvents: 'none',
+              }} />
+              <span style={{
+                position: 'relative',
+                fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                fontSize: '3.5rem',
+                letterSpacing: '0.04em',
+                color: leanColor ?? 'var(--text-primary)',
+                lineHeight: 1,
+              }}>
+                {geography.name.slice(0, 2).toUpperCase()}
+              </span>
+            </div>
 
-                {/* Population */}
-                <div>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                      fontSize: '2rem',
-                      letterSpacing: '0.03em',
-                      color: 'var(--text-primary)',
-                      lineHeight: 1,
-                      marginBottom: '0.2rem',
-                    }}
-                  >
-                    {formatPopulation(geography.population)}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color: 'var(--text-tertiary)',
-                    }}
-                  >
-                    Population
-                  </p>
+            {/* Name */}
+            <h1 style={{
+              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+              fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', letterSpacing: '0.04em', lineHeight: 1.05,
+              color: 'var(--text-primary)', marginBottom: '0.5rem',
+            }}>
+              {geography.name}
+            </h1>
+
+            {/* Type badge */}
+            {geography.type && (
+              <span style={{
+                fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                color: levelColor, background: 'var(--bg-tertiary)', border: '1px solid var(--border)',
+                padding: '0.2rem 0.5rem', borderRadius: '2px', display: 'inline-block', marginBottom: '0.5rem',
+              }}>
+                {geography.type}
+              </span>
+            )}
+
+            {/* Political lean label */}
+            {geography.political_lean && (
+              <p style={{
+                fontSize: '11px', color: leanColor ?? 'var(--text-tertiary)', fontWeight: 700,
+                letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.75rem',
+              }}>
+                {geography.political_lean}
+              </p>
+            )}
+
+            {/* Score / stat rows */}
+            <div style={{ borderTop: '1px solid var(--border)', margin: '1rem 0', paddingTop: '1rem' }}>
+              <p style={{
+                fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: '0.75rem',
+              }}>
+                Signals
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+                {/* Political Lean - badge row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 700 }}>Political Lean</span>
+                  <span style={{ fontSize: '11px', color: leanColor ?? 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    {geography.political_lean ?? '—'}
+                  </span>
                 </div>
 
-                {/* Political Lean */}
-                {geography.political_lean && (
-                  <div>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                        fontSize: '2rem',
-                        letterSpacing: '0.03em',
-                        color: LEAN_COLORS[geography.political_lean.toLowerCase()] ?? 'var(--text-secondary)',
-                        lineHeight: 1,
-                        marginBottom: '0.2rem',
-                      }}
-                    >
-                      {geography.political_lean}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        color: 'var(--text-tertiary)',
-                      }}
-                    >
-                      Political Lean
-                    </p>
-                  </div>
-                )}
+                {/* Population */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 700 }}>Population</span>
+                  <span style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '0.03em' }}>
+                    {geography.population != null ? formatPopulation(geography.population) : '—'}
+                  </span>
+                </div>
 
-                {/* Last Election Results */}
-                {(geography.last_result_dem_pct != null || geography.last_result_rep_pct != null) && (
-                  <div style={{ minWidth: '200px' }}>
-                    <p
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        color: 'var(--text-tertiary)',
-                        marginBottom: '0.75rem',
-                      }}
-                    >
-                      Last Election{geography.last_election_year ? ` (${geography.last_election_year})` : ''}
-                    </p>
+                {/* Last Election Year */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 700 }}>Last Election</span>
+                  <span style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '0.03em' }}>
+                    {geography.last_election_year ?? '—'}
+                  </span>
+                </div>
 
-                    {geography.last_result_dem_pct != null && (
-                      <div style={{ marginBottom: '0.625rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3rem' }}>
-                          <span
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 700,
-                              letterSpacing: '0.1em',
-                              textTransform: 'uppercase',
-                              color: '#60a5fa',
-                            }}
-                          >
-                            DEM
-                          </span>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                              fontSize: '1.25rem',
-                              letterSpacing: '0.03em',
-                              color: '#60a5fa',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {geography.last_result_dem_pct.toFixed(1)}%
-                          </span>
-                        </div>
-                        <div style={{ height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div
-                            className="demo-bar"
-                            style={{ '--target-w': `${geography.last_result_dem_pct}%`, height: '100%', background: '#60a5fa', animationDelay: '0s' } as React.CSSProperties}
-                          />
-                        </div>
-                      </div>
-                    )}
+                {/* Dem % */}
+                <ScoreRow
+                  label="Dem %"
+                  value={geography.last_result_dem_pct ?? null}
+                  colorFn={(_v) => '#3b82f6'}
+                  format={(v) => `${v.toFixed(1)}%`}
+                />
 
-                    {geography.last_result_rep_pct != null && (
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3rem' }}>
-                          <span
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 700,
-                              letterSpacing: '0.1em',
-                              textTransform: 'uppercase',
-                              color: '#f87171',
-                            }}
-                          >
-                            REP
-                          </span>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                              fontSize: '1.25rem',
-                              letterSpacing: '0.03em',
-                              color: '#f87171',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {geography.last_result_rep_pct.toFixed(1)}%
-                          </span>
-                        </div>
-                        <div style={{ height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div
-                            className="demo-bar"
-                            style={{ '--target-w': `${geography.last_result_rep_pct}%`, height: '100%', background: '#f87171', animationDelay: '0.15s' } as React.CSSProperties}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Rep % */}
+                <ScoreRow
+                  label="Rep %"
+                  value={geography.last_result_rep_pct ?? null}
+                  colorFn={(_v) => '#ef4444'}
+                  format={(v) => `${v.toFixed(1)}%`}
+                />
+
+                {/* Electoral Margin */}
+                <ScoreRow
+                  label="Electoral Margin"
+                  value={margin}
+                  format={(v) => `${v.toFixed(1)}%`}
+                  colorFn={(v) => v < 5 ? 'var(--status-warning)' : 'var(--text-primary)'}
+                />
+
+                {/* Total Politicians */}
+                <ScoreRow
+                  label="Total Politicians"
+                  value={politicians.length}
+                  maxValue={20}
+                  colorFn={(_v) => 'var(--text-primary)'}
+                  format={(v) => v.toString()}
+                />
+
+                {/* Endorsed Reps */}
+                <ScoreRow
+                  label="Endorsed Reps"
+                  value={politicians.filter(p => p.endorsement_status === 'endorsed').length}
+                  maxValue={Math.max(politicians.length, 1)}
+                  colorFn={(_v) => 'var(--status-positive)'}
+                  format={(v) => v.toString()}
+                />
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Politicians grid */}
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 1.25rem' }}>
-          <p className="section-label" style={{ marginBottom: '1.5rem' }}>
-            Politicians in {geography.name}
-          </p>
-
-          {politicians.length > 0 ? (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1px',
-                background: 'var(--border)',
-              }}
-            >
-              {politicians.map((politician) => (
-                <div key={politician.id} style={{ background: 'var(--bg-primary)' }}>
-                  <PoliticianCard politician={politician} />
+            {/* Connections */}
+            <div style={{ borderTop: '1px solid var(--border)', margin: '1rem 0', paddingTop: '1rem' }}>
+              <p style={{
+                fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: '0.75rem',
+              }}>
+                Connections
+              </p>
+              {[
+                { label: 'Politicians', count: politicians.length },
+                { label: 'Related Bills', count: geographyBills.length },
+                { label: 'Similar States', count: similarGeos.length },
+              ].map(({ label, count }) => (
+                <div key={label} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '0.5rem 0', borderBottom: '1px solid var(--border)',
+                }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', letterSpacing: '0.04em' }}>{label}</span>
+                  <span style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+                    {count}
+                  </span>
                 </div>
               ))}
             </div>
-          ) : (
-            <div
-              style={{
-                textAlign: 'center',
-                padding: '5rem 1rem',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <p style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                No politicians found for this region
-              </p>
-            </div>
-          )}
+          </aside>
+
+          {/* MAIN CONTENT */}
+          <GeographyDetail
+            geography={geography}
+            politicians={politicians}
+            posts={posts}
+            geographyBills={geographyBills}
+            similarGeos={similarGeos}
+            pastorBlurb={geography.pastor_blurb ?? null}
+          />
         </div>
-
-        {/* Regional Commentary */}
-        {posts.length > 0 && (
-          <div
-            style={{
-              borderTop: '1px solid var(--border)',
-              background: 'var(--bg-secondary)',
-              padding: '2.5rem 0',
-            }}
-          >
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.25rem' }}>
-              <p className="section-label" style={{ marginBottom: '1.5rem' }}>Regional Commentary</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--border)' }}>
-                {posts.map((post) => {
-                  const score = post.sentiment_score ?? 0
-                  const sentimentColor =
-                    score > 0.3
-                      ? 'var(--status-positive)'
-                      : score < -0.3
-                        ? 'var(--status-negative)'
-                        : 'var(--text-tertiary)'
-                  const platformColor = PLATFORM_COLORS[post.source_platform?.toLowerCase() ?? ''] ?? 'var(--text-tertiary)'
-                  return (
-                    <div
-                      key={post.id}
-                      className="geo-post-item"
-                      style={{
-                        background: 'var(--bg-secondary)',
-                        padding: '1.125rem 1.25rem',
-                        display: 'grid',
-                        gridTemplateColumns: '1fr auto',
-                        gap: '1rem',
-                        alignItems: 'start',
-                        transition: 'background 0.1s ease',
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-                          <span
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 700,
-                              letterSpacing: '0.1em',
-                              textTransform: 'uppercase',
-                              color: platformColor,
-                            }}
-                          >
-                            {post.source_platform}
-                          </span>
-                          <span style={{ width: '1px', height: '10px', background: 'var(--border)' }} />
-                          <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
-                            {post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            }) : ''}
-                          </span>
-                        </div>
-                        <p
-                          style={{
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--text-primary)',
-                            lineHeight: 1.65,
-                            letterSpacing: '0.02em',
-                          }}
-                        >
-                          {post.content_text}
-                        </p>
-                      </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p
-                          style={{
-                            fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
-                            fontSize: '1.5rem',
-                            letterSpacing: '0.03em',
-                            color: sentimentColor,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {score > 0 ? '+' : ''}{score.toFixed(2)}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: '10px',
-                            color: 'var(--text-tertiary)',
-                            letterSpacing: '0.1em',
-                            textTransform: 'uppercase',
-                            marginTop: '0.2rem',
-                          }}
-                        >
-                          Signal
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
       </main>
       <Footer />
     </>
