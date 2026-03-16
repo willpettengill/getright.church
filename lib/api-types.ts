@@ -135,5 +135,20 @@ export interface ScoreLeaderboardEntry {
 
 export type BillResponse = Pick<
   Bill,
-  'id' | 'bill_id' | 'name' | 'description' | 'policy_category' | 'chamber' | 'congress' | 'vote_date' | 'party_position_dem' | 'party_position_rep' | 'is_bipartisan'
+  'id' | 'bill_id' | 'slug' | 'name' | 'description' | 'policy_category' | 'chamber' | 'congress' | 'vote_date' | 'party_position_dem' | 'party_position_rep' | 'is_bipartisan'
 >
+
+export interface VoteWithPolitician {
+  vote_id: string
+  politician_id: string
+  politician_name: string
+  politician_slug: string
+  politician_party: string | null
+  politician_portrait_url: string | null
+  politician_state_abbrev: string | null
+  politician_chamber: string | null
+  politician_endorsement_status: string
+  vote_result: string          // 'yea' | 'nay' | 'abstain'
+  vote_date: string | null
+  policy_category: string | null
+}

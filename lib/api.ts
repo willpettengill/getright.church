@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Politician, Post, Vote, Comment, Geography, IssueWithVotes, IssuePositionWithPolitician, PoliticianIssue, Bill } from '@/lib/types'
-import type { SimilarPoliticianResponse, NetworkGraphResponse, ScoreLeaderboardEntry, BillResponse } from '@/lib/api-types'
+import type { SimilarPoliticianResponse, NetworkGraphResponse, ScoreLeaderboardEntry, BillResponse, VoteWithPolitician } from '@/lib/api-types'
 
 export async function getPoliticians(
   geographyId?: string,
@@ -496,6 +496,7 @@ export async function getBills(
   return (data ?? []).map((row) => ({
     id: row.id,
     bill_id: row.bill_id,
+    slug: row.slug,
     name: row.name,
     description: row.description,
     policy_category: row.policy_category,
@@ -506,6 +507,130 @@ export async function getBills(
     party_position_rep: row.party_position_rep,
     is_bipartisan: row.is_bipartisan,
   })) satisfies BillResponse[]
+}
+
+export async function getBill(slug: string): Promise<Bill> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('bills')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+
+  if (error || !data) {
+    throw new Error(`Bill not found: ${slug}`)
+  }
+  return data as Bill
+}
+
+export async function getVotesForBill(billId: string, limit = 100): Promise<VoteWithPolitician[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('votes')
+    .select(`
+      id,
+      politician_id,
+      vote_result,
+      vote_date,
+      policy_category,
+      politician:politicians(id, name, slug, party, portrait_url, state_abbrev, chamber, endorsement_status)
+    `)
+    .eq('bill_uuid', billId)
+    .limit(limit)
+
+  if (error) {
+    console.error('[v0] getVotesForBill error:', error.message)
+    return []
+  }
+
+  return ((data ?? []) as any[]).map((row) => ({
+    vote_id: row.id,
+    politician_id: row.politician_id,
+    politician_name: row.politician?.name ?? '',
+    politician_slug: row.politician?.slug ?? '',
+    politician_party: row.politician?.party ?? null,
+    politician_portrait_url: row.politician?.portrait_url ?? null,
+    politician_state_abbrev: row.politician?.state_abbrev ?? null,
+    politician_chamber: row.politician?.chamber ?? null,
+    politician_endorsement_status: row.politician?.endorsement_status ?? 'unknown',
+    vote_result: row.vote_result,
+    vote_date: row.vote_date,
+    policy_category: row.policy_category,
+  })) satisfies VoteWithPolitician[]
+}
+
+export async function getGeographyBills(geographyId: string, limit = 20): Promise<BillResponse[]> {
+  const supabase = await createClient()
+
+  // Get politician IDs for this geography
+  const { data: politicians, error: polError } = await supabase
+    .from('politicians')
+    .select('id')
+    .eq('geography_id', geographyId)
+
+  if (polError || !politicians?.length) return []
+
+  const politicianIds = politicians.map((p) => p.id)
+
+  // Get distinct bill_uuids from votes
+  const { data: votes, error: votesError } = await supabase
+    .from('votes')
+    .select('bill_uuid')
+    .in('politician_id', politicianIds)
+    .not('bill_uuid', 'is', null)
+
+  if (votesError || !votes?.length) return []
+
+  const billIds = [...new Set((votes as any[]).map((v) => v.bill_uuid))]
+
+  // Fetch those bills
+  const { data: bills, error: billsError } = await supabase
+    .from('bills')
+    .select('*')
+    .in('id', billIds)
+    .order('vote_date', { ascending: false })
+    .limit(limit)
+
+  if (billsError) {
+    console.error('[v0] getGeographyBills error:', billsError.message)
+    return []
+  }
+
+  return ((bills ?? []) as any[]).map((row) => ({
+    id: row.id,
+    bill_id: row.bill_id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description,
+    policy_category: row.policy_category,
+    chamber: row.chamber,
+    congress: row.congress,
+    vote_date: row.vote_date,
+    party_position_dem: row.party_position_dem,
+    party_position_rep: row.party_position_rep,
+    is_bipartisan: row.is_bipartisan,
+  })) satisfies BillResponse[]
+}
+
+export async function getSimilarGeographies(
+  politicalLean: string,
+  excludeId: string,
+  limit = 6,
+): Promise<Geography[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('geographies')
+    .select('*')
+    .eq('political_lean', politicalLean)
+    .neq('id', excludeId)
+    .order('name', { ascending: true })
+    .limit(limit)
+
+  if (error) {
+    console.error('[v0] getSimilarGeographies error:', error.message)
+    return []
+  }
+  return (data ?? []) as Geography[]
 }
 
 export async function getPlatformStats(): Promise<{ politicians: number; issues: number; geographies: number; posts: number }> {
