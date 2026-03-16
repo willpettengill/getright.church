@@ -49,7 +49,6 @@ async function chunkInsert<T extends object>(
 async function phase0() {
   console.log('🗑️  Phase 0: Wiping fictional seed data...');
   const tables = [
-    ['politician_similarities', null],
     ['relationships', null],
     ['politician_issue_positions', null],
     ['votes', null],
@@ -61,6 +60,14 @@ async function phase0() {
     if (error) console.error(`  ✗ wipe ${table}:`, error.message);
   }
 
+  // politician_similarities (composite PK — no id column)
+  {
+    const { error } = await supabase
+      .from('politician_similarities')
+      .delete()
+      .neq('politician_a_id', '00000000-0000-0000-0000-000000000000')
+    if (error) console.error('  ✗ wipe politician_similarities:', error.message)
+  }
   // issue_votes where user_id IS NULL
   {
     const { error } = await supabase.from('issue_votes').delete().is('user_id', null);

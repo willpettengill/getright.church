@@ -65,7 +65,7 @@ export default async function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-text-secondary text-xs">
-                      {new Date(u.created_at).toLocaleDateString()}
+                      {u.created_at ? new Date(u.created_at).toLocaleDateString() : ''}
                     </td>
                     <td className="py-3 px-4">
                       <button className="text-accent-primary hover:text-accent-light text-xs font-mono">

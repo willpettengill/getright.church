@@ -152,7 +152,7 @@ function PostItem({ post }: { post: Post }) {
           </span>
           <span className="pulse-divider" />
           <span className="pulse-date">
-            {new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            {post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
           </span>
         </div>
         <p className="pulse-content">{post.content_text}</p>

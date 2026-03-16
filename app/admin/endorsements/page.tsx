@@ -64,7 +64,7 @@ export default async function AdminEndorsementsPage() {
                     </td>
                     <td className="py-3 px-4 text-text-secondary text-xs">{entry.reason}</td>
                     <td className="py-3 px-4 text-text-tertiary text-xs font-mono">
-                      {new Date(entry.created_at).toLocaleDateString()}
+                      {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : ''}
                     </td>
                   </tr>
                 ))}

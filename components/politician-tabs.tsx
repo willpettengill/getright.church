@@ -169,7 +169,7 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
                       </span>
                       <span style={{ width: '1px', height: '10px', background: 'var(--border)' }} />
                       <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
-                        {new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                       </span>
                     </div>
                     <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.65, letterSpacing: '0.02em' }}>
@@ -234,7 +234,7 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
                       <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
                         {vote.vote_date
                           ? new Date(vote.vote_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                          : new Date(vote.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          : vote.created_at ? new Date(vote.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                       </span>
                       {vote.policy_category && (
                         <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', padding: '0.1rem 0.375rem', borderRadius: '2px' }}>
@@ -302,7 +302,7 @@ export function PoliticianTabs({ posts, votes, comments, politicianId, issuePosi
                       {comment.user?.username || 'Anonymous'}
                     </span>
                     <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em', flexShrink: 0 }}>
-                      {new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {comment.created_at ? new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                     </span>
                   </div>
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.65, letterSpacing: '0.02em', marginBottom: '0.75rem' }}>
