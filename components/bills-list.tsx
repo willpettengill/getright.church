@@ -74,14 +74,20 @@ export function BillsList({ bills }: BillsListProps) {
         {filtered.map((bill) => {
           const categoryColor = CATEGORY_COLORS[bill.policy_category] ?? 'var(--accent-primary)'
           return (
-            <div
+            <a
               key={bill.id}
+              href={bill.slug ? `/bills/${bill.slug}` : '#'}
               style={{
+                display: 'block',
+                textDecoration: 'none',
                 background: 'var(--bg-secondary)',
                 padding: '1.25rem',
                 borderLeft: `3px solid ${categoryColor}`,
                 transition: 'background 0.1s ease',
+                cursor: 'pointer',
               }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-tertiary)' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-secondary)' }}
             >
               {/* Header row: bill_id + category + bipartisan */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
@@ -132,7 +138,7 @@ export function BillsList({ bills }: BillsListProps) {
                   </span>
                 )}
               </div>
-            </div>
+            </a>
           )
         })}
       </div>
