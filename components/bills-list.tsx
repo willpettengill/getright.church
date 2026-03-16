@@ -128,7 +128,7 @@ export function BillsList({ bills }: BillsListProps) {
                 )}
                 {bill.vote_date && (
                   <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em', marginLeft: 'auto' }}>
-                    {new Date(bill.vote_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+                    {bill.vote_date ? new Date(bill.vote_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : ''}
                   </span>
                 )}
               </div>

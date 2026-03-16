@@ -9,321 +9,93 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      geographies: {
+      bills: {
         Row: {
-          id: string
-          slug: string
-          name: string
-          type: string
-          parent_id: string | null
-          boundary_geojson: Json | null
+          bill_id: string
+          chamber: string
+          congress: number | null
           created_at: string
-          population: number | null
-          political_lean: string | null
-          last_result_dem_pct: number | null
-          last_result_rep_pct: number | null
-          last_election_year: number | null
-        }
-        Insert: {
-          id?: string
-          slug: string
-          name: string
-          type: string
-          parent_id?: string | null
-          boundary_geojson?: Json | null
-          created_at?: string
-          population?: number | null
-          political_lean?: string | null
-          last_result_dem_pct?: number | null
-          last_result_rep_pct?: number | null
-          last_election_year?: number | null
-        }
-        Update: {
-          id?: string
-          slug?: string
-          name?: string
-          type?: string
-          parent_id?: string | null
-          boundary_geojson?: Json | null
-          created_at?: string
-          population?: number | null
-          political_lean?: string | null
-          last_result_dem_pct?: number | null
-          last_result_rep_pct?: number | null
-          last_election_year?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "geographies_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "geographies"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      politicians: {
-        Row: {
+          description: string | null
           id: string
-          slug: string
+          introduced_date: string | null
+          is_bipartisan: boolean | null
           name: string
-          title: string | null
-          party: string | null
-          bio: string | null
-          endorsement_status: string
-          geography_id: string | null
-          portrait_url: string | null
-          portrait_style: string | null
-          office_held: string | null
-          years_in_office: number | null
-          geography_level: string | null
-          aggregate_sentiment: number | null
-          policy_alignment: Json | null
-          created_at: string
-          updated_at: string
-          epstein_score: number | null
-          blunch: boolean | null
-          is_squid: boolean | null
-          party_line_score: number | null
-          bipartisan_score: number | null
-          independence_score: number | null
-          district_alignment_score: number | null
-          controversy_score: number | null
-          consistency_score: number | null
-          donor_influence_score: number | null
-          state_abbrev: string | null
-          chamber: string | null
-        }
-        Insert: {
-          id?: string
-          slug: string
-          name: string
-          title?: string | null
-          party?: string | null
-          bio?: string | null
-          endorsement_status?: string
-          geography_id?: string | null
-          portrait_url?: string | null
-          portrait_style?: string | null
-          office_held?: string | null
-          years_in_office?: number | null
-          geography_level?: string | null
-          aggregate_sentiment?: number | null
-          policy_alignment?: Json | null
-          created_at?: string
-          updated_at?: string
-          epstein_score?: number | null
-          blunch?: boolean | null
-          is_squid?: boolean | null
-          party_line_score?: number | null
-          bipartisan_score?: number | null
-          independence_score?: number | null
-          district_alignment_score?: number | null
-          controversy_score?: number | null
-          consistency_score?: number | null
-          donor_influence_score?: number | null
-          state_abbrev?: string | null
-          chamber?: string | null
-        }
-        Update: {
-          id?: string
-          slug?: string
-          name?: string
-          title?: string | null
-          party?: string | null
-          bio?: string | null
-          endorsement_status?: string
-          geography_id?: string | null
-          portrait_url?: string | null
-          portrait_style?: string | null
-          office_held?: string | null
-          years_in_office?: number | null
-          geography_level?: string | null
-          aggregate_sentiment?: number | null
-          policy_alignment?: Json | null
-          created_at?: string
-          updated_at?: string
-          epstein_score?: number | null
-          blunch?: boolean | null
-          is_squid?: boolean | null
-          party_line_score?: number | null
-          bipartisan_score?: number | null
-          independence_score?: number | null
-          district_alignment_score?: number | null
-          controversy_score?: number | null
-          consistency_score?: number | null
-          donor_influence_score?: number | null
-          state_abbrev?: string | null
-          chamber?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "politicians_geography_id_fkey"
-            columns: ["geography_id"]
-            isOneToOne: false
-            referencedRelation: "geographies"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      posts: {
-        Row: {
-          id: string
-          source_platform: string
-          source_url: string | null
-          content_text: string | null
-          content_embed_html: string | null
-          sentiment_score: number | null
-          politician_ids: string[] | null
-          geography_id: string | null
-          approved: boolean | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          source_platform: string
-          source_url?: string | null
-          content_text?: string | null
-          content_embed_html?: string | null
-          sentiment_score?: number | null
-          politician_ids?: string[] | null
-          geography_id?: string | null
-          approved?: boolean | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          source_platform?: string
-          source_url?: string | null
-          content_text?: string | null
-          content_embed_html?: string | null
-          sentiment_score?: number | null
-          politician_ids?: string[] | null
-          geography_id?: string | null
-          approved?: boolean | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "posts_geography_id_fkey"
-            columns: ["geography_id"]
-            isOneToOne: false
-            referencedRelation: "geographies"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      votes: {
-        Row: {
-          id: string
-          politician_id: string
-          bill_name: string
-          bill_id: string | null
+          party_position_dem: string | null
+          party_position_rep: string | null
+          pastor_blurb: string | null
+          policy_category: string
+          slug: string | null
           vote_date: string | null
-          vote_result: string
-          policy_category: string | null
-          source_url: string | null
-          created_at: string
-          bill_uuid: string | null
-          party_vote: string | null
         }
         Insert: {
-          id?: string
-          politician_id: string
-          bill_name: string
-          bill_id?: string | null
-          vote_date?: string | null
-          vote_result: string
-          policy_category?: string | null
-          source_url?: string | null
+          bill_id: string
+          chamber: string
+          congress?: number | null
           created_at?: string
-          bill_uuid?: string | null
-          party_vote?: string | null
+          description?: string | null
+          id?: string
+          introduced_date?: string | null
+          is_bipartisan?: boolean | null
+          name: string
+          party_position_dem?: string | null
+          party_position_rep?: string | null
+          pastor_blurb?: string | null
+          policy_category: string
+          slug?: string | null
+          vote_date?: string | null
         }
         Update: {
+          bill_id?: string
+          chamber?: string
+          congress?: number | null
+          created_at?: string
+          description?: string | null
           id?: string
-          politician_id?: string
-          bill_name?: string
-          bill_id?: string | null
+          introduced_date?: string | null
+          is_bipartisan?: boolean | null
+          name?: string
+          party_position_dem?: string | null
+          party_position_rep?: string | null
+          pastor_blurb?: string | null
+          policy_category?: string
+          slug?: string | null
           vote_date?: string | null
-          vote_result?: string
-          policy_category?: string | null
-          source_url?: string | null
-          created_at?: string
-          bill_uuid?: string | null
-          party_vote?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "votes_politician_id_fkey"
-            columns: ["politician_id"]
-            isOneToOne: false
-            referencedRelation: "politicians"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "votes_bill_uuid_fkey"
-            columns: ["bill_uuid"]
-            isOneToOne: false
-            referencedRelation: "bills"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      users: {
-        Row: {
-          id: string
-          username: string | null
-          role: string
-          created_at: string
-        }
-        Insert: {
-          id: string
-          username?: string | null
-          role?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          username?: string | null
-          role?: string
-          created_at?: string
         }
         Relationships: []
       }
       comments: {
         Row: {
-          id: string
-          politician_id: string
-          user_id: string | null
           body: string
-          parent_id: string | null
-          upvotes: number | null
+          created_at: string | null
           downvotes: number | null
           flagged: boolean | null
-          created_at: string
+          id: string
+          parent_id: string | null
+          politician_id: string
+          upvotes: number | null
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          politician_id: string
-          user_id?: string | null
           body: string
-          parent_id?: string | null
-          upvotes?: number | null
+          created_at?: string | null
           downvotes?: number | null
           flagged?: boolean | null
-          created_at?: string
+          id?: string
+          parent_id?: string | null
+          politician_id: string
+          upvotes?: number | null
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          politician_id?: string
-          user_id?: string | null
           body?: string
-          parent_id?: string | null
-          upvotes?: number | null
+          created_at?: string | null
           downvotes?: number | null
           flagged?: boolean | null
-          created_at?: string
+          id?: string
+          parent_id?: string | null
+          politician_id?: string
+          upvotes?: number | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -340,105 +112,35 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          }
         ]
-      }
-      entities: {
-        Row: {
-          id: string
-          name: string
-          type: string
-          description: string | null
-          external_url: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          type: string
-          description?: string | null
-          external_url?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          type?: string
-          description?: string | null
-          external_url?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      relationships: {
-        Row: {
-          id: string
-          entity_a_id: string
-          entity_a_type: string
-          entity_b_id: string
-          entity_b_type: string
-          relationship_type: string
-          weight: number | null
-          metadata_json: Json | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          entity_a_id: string
-          entity_a_type: string
-          entity_b_id: string
-          entity_b_type: string
-          relationship_type: string
-          weight?: number | null
-          metadata_json?: Json | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          entity_a_id?: string
-          entity_a_type?: string
-          entity_b_id?: string
-          entity_b_type?: string
-          relationship_type?: string
-          weight?: number | null
-          metadata_json?: Json | null
-          created_at?: string
-        }
-        Relationships: []
       }
       endorsement_log: {
         Row: {
+          changed_by: string | null
+          created_at: string | null
           id: string
+          new_status: string
           politician_id: string
           previous_status: string | null
-          new_status: string
           reason: string | null
-          changed_by: string | null
-          created_at: string
         }
         Insert: {
+          changed_by?: string | null
+          created_at?: string | null
           id?: string
+          new_status: string
           politician_id: string
           previous_status?: string | null
-          new_status: string
           reason?: string | null
-          changed_by?: string | null
-          created_at?: string
         }
         Update: {
+          changed_by?: string | null
+          created_at?: string | null
           id?: string
+          new_status?: string
           politician_id?: string
           previous_status?: string | null
-          new_status?: string
           reason?: string | null
-          changed_by?: string | null
-          created_at?: string
         }
         Relationships: [
           {
@@ -448,105 +150,112 @@ export type Database = {
             referencedRelation: "politicians"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "endorsement_log_changed_by_fkey"
-            columns: ["changed_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
         ]
       }
-      issues: {
+      entities: {
         Row: {
-          id: string
-          slug: string
-          title: string
+          created_at: string | null
           description: string | null
-          category: string
-          created_at: string
+          external_url: string | null
+          id: string
+          name: string
+          type: string
         }
         Insert: {
-          id?: string
-          slug: string
-          title: string
+          created_at?: string | null
           description?: string | null
-          category: string
-          created_at?: string
+          external_url?: string | null
+          id?: string
+          name: string
+          type: string
         }
         Update: {
-          id?: string
-          slug?: string
-          title?: string
+          created_at?: string | null
           description?: string | null
-          category?: string
-          created_at?: string
+          external_url?: string | null
+          id?: string
+          name?: string
+          type?: string
         }
         Relationships: []
       }
-      politician_issue_positions: {
+      geographies: {
         Row: {
+          boundary_geojson: Json | null
+          created_at: string | null
           id: string
-          politician_id: string
-          issue_id: string
-          position: string
-          notes: string | null
-          created_at: string
+          last_election_year: number | null
+          last_result_dem_pct: number | null
+          last_result_rep_pct: number | null
+          name: string
+          parent_id: string | null
+          pastor_blurb: string | null
+          political_lean: string | null
+          population: number | null
+          slug: string
+          type: string
         }
         Insert: {
+          boundary_geojson?: Json | null
+          created_at?: string | null
           id?: string
-          politician_id: string
-          issue_id: string
-          position: string
-          notes?: string | null
-          created_at?: string
+          last_election_year?: number | null
+          last_result_dem_pct?: number | null
+          last_result_rep_pct?: number | null
+          name: string
+          parent_id?: string | null
+          pastor_blurb?: string | null
+          political_lean?: string | null
+          population?: number | null
+          slug: string
+          type: string
         }
         Update: {
+          boundary_geojson?: Json | null
+          created_at?: string | null
           id?: string
-          politician_id?: string
-          issue_id?: string
-          position?: string
-          notes?: string | null
-          created_at?: string
+          last_election_year?: number | null
+          last_result_dem_pct?: number | null
+          last_result_rep_pct?: number | null
+          name?: string
+          parent_id?: string | null
+          pastor_blurb?: string | null
+          political_lean?: string | null
+          population?: number | null
+          slug?: string
+          type?: string
         }
         Relationships: [
           {
-            foreignKeyName: "politician_issue_positions_politician_id_fkey"
-            columns: ["politician_id"]
+            foreignKeyName: "geographies_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: "politicians"
+            referencedRelation: "geographies"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "politician_issue_positions_issue_id_fkey"
-            columns: ["issue_id"]
-            isOneToOne: false
-            referencedRelation: "issues"
-            referencedColumns: ["id"]
-          }
         ]
       }
       issue_votes: {
         Row: {
+          created_at: string
           id: string
           issue_id: string
           user_id: string | null
           vote: string
-          created_at: string
         }
         Insert: {
+          created_at?: string
           id?: string
           issue_id: string
           user_id?: string | null
           vote: string
-          created_at?: string
         }
         Update: {
+          created_at?: string
           id?: string
           issue_id?: string
           user_id?: string | null
           vote?: string
-          created_at?: string
         }
         Relationships: [
           {
@@ -556,84 +265,101 @@ export type Database = {
             referencedRelation: "issues"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "issue_votes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
         ]
       }
-      bills: {
+      issues: {
         Row: {
-          id: string
-          bill_id: string
-          name: string
-          description: string | null
-          policy_category: string
-          chamber: string
-          congress: number | null
-          introduced_date: string | null
-          vote_date: string | null
-          party_position_dem: string | null
-          party_position_rep: string | null
-          is_bipartisan: boolean | null
+          category: string
           created_at: string
+          description: string | null
+          id: string
+          pastor_blurb: string | null
+          slug: string
+          title: string
         }
         Insert: {
-          id?: string
-          bill_id: string
-          name: string
-          description?: string | null
-          policy_category: string
-          chamber: string
-          congress?: number | null
-          introduced_date?: string | null
-          vote_date?: string | null
-          party_position_dem?: string | null
-          party_position_rep?: string | null
-          is_bipartisan?: boolean | null
+          category: string
           created_at?: string
+          description?: string | null
+          id?: string
+          pastor_blurb?: string | null
+          slug: string
+          title: string
         }
         Update: {
-          id?: string
-          bill_id?: string
-          name?: string
-          description?: string | null
-          policy_category?: string
-          chamber?: string
-          congress?: number | null
-          introduced_date?: string | null
-          vote_date?: string | null
-          party_position_dem?: string | null
-          party_position_rep?: string | null
-          is_bipartisan?: boolean | null
+          category?: string
           created_at?: string
+          description?: string | null
+          id?: string
+          pastor_blurb?: string | null
+          slug?: string
+          title?: string
         }
         Relationships: []
       }
-      politician_similarities: {
+      politician_issue_positions: {
         Row: {
-          politician_a_id: string
-          politician_b_id: string
-          similarity: number
-          shared_votes: number
-          computed_at: string
+          created_at: string
+          id: string
+          issue_id: string
+          notes: string | null
+          politician_id: string
+          position: string
         }
         Insert: {
-          politician_a_id: string
-          politician_b_id: string
-          similarity: number
-          shared_votes?: number
-          computed_at?: string
+          created_at?: string
+          id?: string
+          issue_id: string
+          notes?: string | null
+          politician_id: string
+          position: string
         }
         Update: {
+          created_at?: string
+          id?: string
+          issue_id?: string
+          notes?: string | null
+          politician_id?: string
+          position?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "politician_issue_positions_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "politician_issue_positions_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      politician_similarities: {
+        Row: {
+          computed_at: string
+          politician_a_id: string
+          politician_b_id: string
+          shared_votes: number
+          similarity: number
+        }
+        Insert: {
+          computed_at?: string
+          politician_a_id: string
+          politician_b_id: string
+          shared_votes?: number
+          similarity: number
+        }
+        Update: {
+          computed_at?: string
           politician_a_id?: string
           politician_b_id?: string
-          similarity?: number
           shared_votes?: number
-          computed_at?: string
+          similarity?: number
         }
         Relationships: [
           {
@@ -649,7 +375,267 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "politicians"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      politicians: {
+        Row: {
+          aggregate_sentiment: number | null
+          bipartisan_score: number | null
+          blunch: boolean | null
+          bio: string | null
+          chamber: string | null
+          consistency_score: number | null
+          controversy_score: number | null
+          created_at: string | null
+          district_alignment_score: number | null
+          donor_influence_score: number | null
+          endorsement_status: string
+          epstein_score: number | null
+          geography_id: string | null
+          geography_level: string | null
+          id: string
+          independence_score: number | null
+          is_squid: boolean | null
+          name: string
+          office_held: string | null
+          party: string | null
+          party_line_score: number | null
+          pastor_blurb: string | null
+          policy_alignment: Json | null
+          portrait_style: string | null
+          portrait_url: string | null
+          slug: string
+          state_abbrev: string | null
+          title: string | null
+          updated_at: string | null
+          years_in_office: number | null
+        }
+        Insert: {
+          aggregate_sentiment?: number | null
+          bipartisan_score?: number | null
+          blunch?: boolean | null
+          bio?: string | null
+          chamber?: string | null
+          consistency_score?: number | null
+          controversy_score?: number | null
+          created_at?: string | null
+          district_alignment_score?: number | null
+          donor_influence_score?: number | null
+          endorsement_status?: string
+          epstein_score?: number | null
+          geography_id?: string | null
+          geography_level?: string | null
+          id?: string
+          independence_score?: number | null
+          is_squid?: boolean | null
+          name: string
+          office_held?: string | null
+          party?: string | null
+          party_line_score?: number | null
+          pastor_blurb?: string | null
+          policy_alignment?: Json | null
+          portrait_style?: string | null
+          portrait_url?: string | null
+          slug: string
+          state_abbrev?: string | null
+          title?: string | null
+          updated_at?: string | null
+          years_in_office?: number | null
+        }
+        Update: {
+          aggregate_sentiment?: number | null
+          bipartisan_score?: number | null
+          blunch?: boolean | null
+          bio?: string | null
+          chamber?: string | null
+          consistency_score?: number | null
+          controversy_score?: number | null
+          created_at?: string | null
+          district_alignment_score?: number | null
+          donor_influence_score?: number | null
+          endorsement_status?: string
+          epstein_score?: number | null
+          geography_id?: string | null
+          geography_level?: string | null
+          id?: string
+          independence_score?: number | null
+          is_squid?: boolean | null
+          name?: string
+          office_held?: string | null
+          party?: string | null
+          party_line_score?: number | null
+          pastor_blurb?: string | null
+          policy_alignment?: Json | null
+          portrait_style?: string | null
+          portrait_url?: string | null
+          slug?: string
+          state_abbrev?: string | null
+          title?: string | null
+          updated_at?: string | null
+          years_in_office?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "politicians_geography_id_fkey"
+            columns: ["geography_id"]
+            isOneToOne: false
+            referencedRelation: "geographies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          approved: boolean | null
+          content_embed_html: string | null
+          content_text: string | null
+          created_at: string | null
+          geography_id: string | null
+          id: string
+          politician_ids: string[] | null
+          sentiment_score: number | null
+          source_platform: string
+          source_url: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          content_embed_html?: string | null
+          content_text?: string | null
+          created_at?: string | null
+          geography_id?: string | null
+          id?: string
+          politician_ids?: string[] | null
+          sentiment_score?: number | null
+          source_platform: string
+          source_url?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          content_embed_html?: string | null
+          content_text?: string | null
+          created_at?: string | null
+          geography_id?: string | null
+          id?: string
+          politician_ids?: string[] | null
+          sentiment_score?: number | null
+          source_platform?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      relationships: {
+        Row: {
+          created_at: string | null
+          entity_a_id: string
+          entity_a_type: string
+          entity_b_id: string
+          entity_b_type: string
+          id: string
+          metadata_json: Json | null
+          relationship_type: string
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_a_id: string
+          entity_a_type: string
+          entity_b_id: string
+          entity_b_type: string
+          id?: string
+          metadata_json?: Json | null
+          relationship_type: string
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_a_id?: string
+          entity_a_type?: string
+          entity_b_id?: string
+          entity_b_type?: string
+          id?: string
+          metadata_json?: Json | null
+          relationship_type?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          role?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      votes: {
+        Row: {
+          bill_id: string | null
+          bill_name: string
+          bill_uuid: string | null
+          created_at: string | null
+          id: string
+          party_vote: string | null
+          policy_category: string | null
+          politician_id: string
+          source_url: string | null
+          vote_date: string | null
+          vote_result: string
+        }
+        Insert: {
+          bill_id?: string | null
+          bill_name: string
+          bill_uuid?: string | null
+          created_at?: string | null
+          id?: string
+          party_vote?: string | null
+          policy_category?: string | null
+          politician_id: string
+          source_url?: string | null
+          vote_date?: string | null
+          vote_result: string
+        }
+        Update: {
+          bill_id?: string | null
+          bill_name?: string
+          bill_uuid?: string | null
+          created_at?: string | null
+          id?: string
+          party_vote?: string | null
+          policy_category?: string | null
+          politician_id?: string
+          source_url?: string | null
+          vote_date?: string | null
+          vote_result?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_bill_uuid_fkey"
+            columns: ["bill_uuid"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -657,7 +643,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
@@ -667,3 +656,108 @@ export type Database = {
     }
   }
 }
+
+type DefaultSchema = Database[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never

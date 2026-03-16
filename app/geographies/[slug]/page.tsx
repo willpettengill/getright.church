@@ -398,11 +398,11 @@ export default async function GeographyPage(props: { params: Promise<{ slug: str
                           </span>
                           <span style={{ width: '1px', height: '10px', background: 'var(--border)' }} />
                           <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>
-                            {new Date(post.created_at).toLocaleDateString('en-US', {
+                            {post.created_at ? new Date(post.created_at).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
-                            })}
+                            }) : ''}
                           </span>
                         </div>
                         <p

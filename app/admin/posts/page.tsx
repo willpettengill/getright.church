@@ -38,7 +38,7 @@ export default async function AdminPostsPage() {
                   <div className="flex-1">
                     <p className="text-text-primary mb-2 line-clamp-2">{post.content_text}</p>
                     <p className="text-xs text-text-secondary font-mono">
-                      {post.source_platform} • {new Date(post.created_at).toLocaleDateString()}
+                      {post.source_platform} • {post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}
                     </p>
                   </div>
                   <span

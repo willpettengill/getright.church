@@ -49,4 +49,34 @@ npm run dev        # Start dev server
 npm run build      # Production build
 npm run lint       # Run linter
 npm run gen:types  # Regenerate lib/database.types.ts from Supabase schema
+npm run db:status  # Print live row counts for every table
 ```
+
+## Verifying DB State
+
+**Never report entity counts by reading seed SQL files.** Seed files are scripts —
+they may not have been applied, may have been applied partially, or may have been
+superseded. To get accurate counts:
+
+```bash
+npm run db:status
+```
+
+This queries the live Supabase database and prints row counts for every table.
+
+### Applied migrations (update this list when running migrations)
+- `001_schema.sql` — base schema
+- `002_scores.sql` — epstein_score, blunch, is_squid columns
+- `003_seed_expanded.sql` — 12 politicians, geographies, votes, posts, comments
+- `004_issues.sql` — issues + politician_issue_positions tables
+- `005_geo_demographics.sql` — demographics columns on geographies
+- `006_seed_issues.sql` — 8 issues, issue_votes
+- `007_seed_demographics.sql` — geography demographic data
+- `008_politician_scores.sql` — intelligence score columns + state_abbrev + chamber ✓ applied 2026-03-15
+- `009_bills.sql` — bills table + votes.bill_uuid + votes.party_vote ✓ applied 2026-03-15
+- `010_similarities.sql` — politician_similarities table ✓ applied 2026-03-15
+- `011_fix_rls_recursion.sql` — is_admin() SECURITY DEFINER function + fix users_admin_all recursion ✓ applied 2026-03-15
+- `012_pastor_blurb.sql` — pastor_blurb text column on all 4 entity tables + bills.slug ✓ applied 2026-03-16
+
+### Seed state
+- `seed-v2.ts` last run 2026-03-15 — 51 geographies, 50 bills, 138 politicians, 2445 votes, 16 issues, 2208 positions, 1271 similarity pairs, 800 issue_votes, 350 posts
