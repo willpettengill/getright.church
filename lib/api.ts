@@ -106,7 +106,7 @@ export async function getComments(
   return (data ?? []) as Comment[]
 }
 
-export async function getGeographies(parentId?: string): Promise<Geography[]> {
+export async function getGeographies(parentId?: string, type?: string): Promise<Geography[]> {
   const supabase = await createClient()
   let query = supabase
     .from('geographies')
@@ -115,6 +115,8 @@ export async function getGeographies(parentId?: string): Promise<Geography[]> {
 
   if (parentId) {
     query = query.eq('parent_id', parentId)
+  } else if (type) {
+    query = query.eq('type', type)   // no parent_id filter — returns all of that type
   } else {
     query = query.is('parent_id', null)
   }
