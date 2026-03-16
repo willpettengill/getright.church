@@ -111,9 +111,12 @@ export function PoliticianDetail({
   const categoryCounts = Object.entries(categoryMap).sort((a, b) => b[1] - a[1])
   const maxCategoryCount = categoryCounts.length > 0 ? categoryCounts[0][1] : 1
 
-  const sentimentNormalized = aggregateSentiment != null
-    ? Math.max(0, Math.min(1, (aggregateSentiment + 1) / 2))
-    : 0.5
+  const sentimentPoints = aggregateSentiment != null
+    ? [0.2, 0.35, 0.1, 0.4, 0.3, Math.max(0, Math.min(1, (aggregateSentiment + 1) / 2))]
+    : [0.2, 0.35, 0.1, 0.4, 0.3]
+  const sentimentLabels = aggregateSentiment != null
+    ? ['6mo ago', '5mo', '4mo', '3mo', '2mo', 'now']
+    : ['6mo ago', '5mo', '4mo', '3mo', '2mo']
 
   return (
     <div>
@@ -342,8 +345,8 @@ export function PoliticianDetail({
             <div style={{ background: 'var(--bg-secondary)', padding: '1.25rem', borderLeft: '2px solid var(--accent-primary)' }}>
               <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: '1rem' }}>Sentiment Trend</p>
               <SentimentLineChart
-                points={[0.2, 0.35, 0.1, 0.4, 0.3, sentimentNormalized]}
-                labels={['6mo ago', '5mo', '4mo', '3mo', '2mo', 'now']}
+                points={sentimentPoints}
+                labels={sentimentLabels}
                 height={80}
               />
             </div>
@@ -447,7 +450,7 @@ export function PoliticianDetail({
             {network.edges.length === 0 ? (
               <EmptyState message="No network data" />
             ) : (
-              network.edges.map((edge) => {
+              network.edges.map((edge, idx) => {
                 const entity = network.nodes.find((n) => n.id === edge.source && n.node_type === 'entity')
                 if (!entity) return null
                 const typeColors: Record<string, string> = {
@@ -456,7 +459,7 @@ export function PoliticianDetail({
                 const typeColor = typeColors[entity.type] ?? 'var(--text-tertiary)'
                 return (
                   <div
-                    key={`${edge.source}-${edge.relationship_type}`}
+                    key={idx}
                     style={{
                       background: 'var(--bg-secondary)',
                       padding: '1rem 1.25rem',

@@ -6,6 +6,7 @@ import { PastorBlurb } from '@/components/pastor-blurb'
 import { PoliticianDetail } from '@/components/politician-detail'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import type { Politician } from '@/lib/types'
 
 export const revalidate = 3600
 
@@ -24,7 +25,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
 export default async function PoliticianPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params
-  let politician
+  let politician: Politician
   try {
     politician = await getPolitician(params.slug)
   } catch {
