@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       geographies: {
@@ -52,7 +52,15 @@ export interface Database {
           last_result_rep_pct?: number | null
           last_election_year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "geographies_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "geographies"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       politicians: {
         Row: {
@@ -71,6 +79,8 @@ export interface Database {
           geography_level: string | null
           aggregate_sentiment: number | null
           policy_alignment: Json | null
+          created_at: string
+          updated_at: string
           epstein_score: number | null
           blunch: boolean | null
           is_squid: boolean | null
@@ -83,8 +93,6 @@ export interface Database {
           donor_influence_score: number | null
           state_abbrev: string | null
           chamber: string | null
-          created_at: string
-          updated_at: string
         }
         Insert: {
           id?: string
@@ -96,12 +104,14 @@ export interface Database {
           endorsement_status?: string
           geography_id?: string | null
           portrait_url?: string | null
-          portrait_style?: string | null
+          portrait_style?: string
           office_held?: string | null
           years_in_office?: number | null
           geography_level?: string | null
           aggregate_sentiment?: number | null
           policy_alignment?: Json | null
+          created_at?: string
+          updated_at?: string
           epstein_score?: number | null
           blunch?: boolean | null
           is_squid?: boolean | null
@@ -114,8 +124,6 @@ export interface Database {
           donor_influence_score?: number | null
           state_abbrev?: string | null
           chamber?: string | null
-          created_at?: string
-          updated_at?: string
         }
         Update: {
           id?: string
@@ -127,12 +135,14 @@ export interface Database {
           endorsement_status?: string
           geography_id?: string | null
           portrait_url?: string | null
-          portrait_style?: string | null
+          portrait_style?: string
           office_held?: string | null
           years_in_office?: number | null
           geography_level?: string | null
           aggregate_sentiment?: number | null
           policy_alignment?: Json | null
+          created_at?: string
+          updated_at?: string
           epstein_score?: number | null
           blunch?: boolean | null
           is_squid?: boolean | null
@@ -145,10 +155,16 @@ export interface Database {
           donor_influence_score?: number | null
           state_abbrev?: string | null
           chamber?: string | null
-          created_at?: string
-          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "politicians_geography_id_fkey"
+            columns: ["geography_id"]
+            isOneToOne: false
+            referencedRelation: "geographies"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       posts: {
         Row: {
@@ -187,7 +203,15 @@ export interface Database {
           approved?: boolean | null
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_geography_id_fkey"
+            columns: ["geography_id"]
+            isOneToOne: false
+            referencedRelation: "geographies"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       votes: {
         Row: {
@@ -199,9 +223,9 @@ export interface Database {
           vote_result: string
           policy_category: string | null
           source_url: string | null
+          created_at: string
           bill_uuid: string | null
           party_vote: string | null
-          created_at: string
         }
         Insert: {
           id?: string
@@ -212,9 +236,9 @@ export interface Database {
           vote_result: string
           policy_category?: string | null
           source_url?: string | null
+          created_at?: string
           bill_uuid?: string | null
           party_vote?: string | null
-          created_at?: string
         }
         Update: {
           id?: string
@@ -225,11 +249,26 @@ export interface Database {
           vote_result?: string
           policy_category?: string | null
           source_url?: string | null
+          created_at?: string
           bill_uuid?: string | null
           party_vote?: string | null
-          created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "votes_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_bill_uuid_fkey"
+            columns: ["bill_uuid"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       users: {
         Row: {
@@ -250,7 +289,15 @@ export interface Database {
           role?: string
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       comments: {
         Row: {
@@ -286,7 +333,29 @@ export interface Database {
           flagged?: boolean | null
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "comments_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       entities: {
         Row: {
@@ -379,7 +448,22 @@ export interface Database {
           changed_by?: string | null
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "endorsement_log_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "endorsement_log_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       issues: {
         Row: {
@@ -433,7 +517,61 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "politician_issue_positions_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "politician_issue_positions_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      issue_votes: {
+        Row: {
+          id: string
+          issue_id: string
+          user_id: string | null
+          vote: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          issue_id: string
+          user_id?: string | null
+          vote: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          issue_id?: string
+          user_id?: string | null
+          vote?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issue_votes_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issue_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       bills: {
         Row: {
@@ -505,31 +643,22 @@ export interface Database {
           shared_votes?: number
           computed_at?: string
         }
-        Relationships: []
-      }
-      issue_votes: {
-        Row: {
-          id: string
-          issue_id: string
-          user_id: string | null
-          vote: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          issue_id: string
-          user_id?: string | null
-          vote: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          issue_id?: string
-          user_id?: string | null
-          vote?: string
-          created_at?: string
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "politician_similarities_politician_a_id_fkey"
+            columns: ["politician_a_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "politician_similarities_politician_b_id_fkey"
+            columns: ["politician_b_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
