@@ -152,7 +152,7 @@ export function IssueDetail({ issue, positions, relatedBills }: IssueDetailProps
                     color: ip.position === 'support' ? 'var(--status-positive)' : ip.position === 'oppose' ? 'var(--status-negative)' : 'var(--text-secondary)',
                     flexShrink: 0,
                   }}>
-                    {ip.position.toUpperCase()}
+                    {ip.position?.toUpperCase() ?? '—'}
                   </span>
                 </a>
               ))}
